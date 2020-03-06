@@ -2,29 +2,34 @@
 
 > This project created to help me learn new technologies and give some expirience. This project can include a lot of different technologies: data virtuliazation, autorization, front end, back end, devops.
 
-## Starter
-### Possible stack:
+Project's todos graph [trello](https://trello.com/b/sIgFvLWc/bug-tracker).
 
-### Front end
+## Possible stack
+
+Front end:
+
 - React
 - GraphQL
 - Jest
 - D3 or simpler graph library
 - Webpack
 
-### Back end
+Back end:
+
 - Python
   - Flask
 - Pytest
 - Poetry
 - Micro Services
 
-### DevOps
+DevOps:
+
 - Docker
   - Kubernets
 - AWS
 
-### Database
+Database:
+
 - Filesystem
 - SQLite
 - Postgres
