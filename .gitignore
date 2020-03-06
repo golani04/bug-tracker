@@ -1,4 +1,7 @@
 __pycache__
 node_modules
+.coverage
 .env
 .vscode
+db_files
+reports
