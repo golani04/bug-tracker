@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import List
 
+from flask import escape
+from backend.models import validate
+
 
 @dataclass
 class Project:
@@ -15,12 +18,16 @@ class Project:
         compare=False,
     )
     favorite: bool = field(default=False, metadata="Give a project preference.")
-    _created: date = field(default_factory=date.today, repr=False)
-    _updated: datetime = field(default_factory=datetime.utcnow, repr=False)
+    _created: date = field(default_factory=date.today, init=False, repr=False)
+    _updated: datetime = field(default_factory=datetime.utcnow, init=False, repr=False)
     # FK, that collect all items that is connected to project
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     issues: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
 
     def __post_init__(self):
-        print(self)
+        validate.item_id(self.id)
+        validate.item_id(self.maintainer)
+        # convert unallowed signs to html codes
+        self.name = escape(self.name)
+        self.description = escape(self.description)
