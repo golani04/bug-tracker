@@ -1,7 +1,9 @@
-from flask import jsonify
+from flask import jsonify, request
 
-from backend import db
 from backend.api import bp
+from backend.api.errors import bad_request
+
+from backend.models.projects import Project
 
 
 @bp.route("/projects", methods=["GET"])
@@ -11,7 +13,14 @@ def get_projects():
 
 @bp.route("/projects", methods=["POST"])
 def create_project():
-    return jsonify(), 201
+    data = request.get_json()
+    if data is None:
+        return bad_request("Missing payload or payload is not json.")
+
+    project = Project.create(**data)
+    project.save()
+
+    return jsonify(project), 201
 
 
 @bp.route("/projects/<string:project_id>", methods=["GET"])
