@@ -6,7 +6,7 @@ from backend.api import bp
 
 @bp.route("/projects", methods=["GET"])
 def get_projects():
-    return jsonify(db.get_projects()), 200
+    return jsonify(Project.get_all_projects()), 200
 
 
 @bp.route("/projects", methods=["POST"])

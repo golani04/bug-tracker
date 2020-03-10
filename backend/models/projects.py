@@ -3,6 +3,7 @@ from datetime import date, datetime
 from typing import Dict, List, Union
 
 from flask import escape
+from backend import db
 from backend.models import validate, util
 
 
@@ -37,3 +38,7 @@ class Project:
         cls, name: str, maintainer: str, description: str = "", favorite: bool = False
     ) -> "Project":
         return cls(util.create_id(), name, maintainer, description, favorite)
+
+    @classmethod
+    def get_all_projects(cls):
+        return db.get_projects()
