@@ -1,4 +1,5 @@
-from hashlib import sha256
-from typing import NewType
+import secrets
 
-ItemID = NewType("ItemID", sha256)
+
+def create_id():
+    return secrets.token_hex()
