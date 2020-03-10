@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import List
+from typing import Dict, List, Union
 
 from flask import escape
-from backend.models import validate
+from backend.models import validate, util
 
 
 @dataclass
@@ -31,3 +31,9 @@ class Project:
         # convert unallowed signs to html codes
         self.name = escape(self.name)
         self.description = escape(self.description)
+
+    @classmethod
+    def create(
+        cls, name: str, maintainer: str, description: str = "", favorite: bool = False
+    ) -> "Project":
+        return cls(util.create_id(), name, maintainer, description, favorite)
