@@ -42,3 +42,6 @@ class Project:
     @classmethod
     def get_all_projects(cls):
         return db.get_projects()
+
+    def save(self):
+        pass

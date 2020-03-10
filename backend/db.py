@@ -16,5 +16,18 @@ def _read_json(path: str) -> List[Dict]:
         return []
 
 
-def get_projects():
+def _save_json(path: str, data: List) -> bool:
+    try:
+        with open(path, mode="w") as f:
+            f.write(json.loads(data))
+            return True
+    except (IOError, FileExistsError, FileExistsError):
+        return False
+
+
+def get_projects() -> List[Dict]:
     return _read_json(_projects)
+
+
+def save_projects(projects: List[Dict]) -> bool:
+    return _save_json(_projects, projects)
