@@ -9,7 +9,7 @@ from backend.models import validate, util
 @dataclass
 class Project:
     id: str
-    name: str = field(compare=False)
+    name: str = field(compare=False, metadata="Give your project a name.")
     maintainer: str = field(compare=False)
     description: str = field(
         default="",
