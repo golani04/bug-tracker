@@ -4,7 +4,7 @@ from flask import jsonify
 from werkzeug.http import HTTP_STATUS_CODES
 
 
-ErrorMessageType = Union[str, Dict, List[str, Dict]]
+ErrorMessageType = Union[str, Dict, List[Union[str, Dict]]]
 
 
 def error_response(status_code: int, message: Optional[ErrorMessageType] = None):
