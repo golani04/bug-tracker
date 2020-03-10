@@ -41,3 +41,18 @@ def test_post_init_escape_html_name():
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
 
     assert project.name == "tes&lt;t"
+
+
+@freeze_time("2020-1-1")
+def test_create_project():
+    project = Project.create("Test project", _MAINTAINER_ID, "First create")
+
+    assert isinstance(project, Project)
+    assert project._created == date(2020, 1, 1)
+    assert project.maintainer == _MAINTAINER_ID
+    assert project.favorite is False
+
+
+def test_maintainer_id_invalid():
+    with pytest.raises(ValidationError):
+        Project.create("Test project", "_MAINTAINER_ID", "First create")
