@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Union
 
 
-_ALPHANUMERIC = re.compile(r"[A-Za-z0-9]+")
+_ALPHANUMERIC = re.compile(r"[^A-Za-z0-9]+")
 
 
 @dataclass
@@ -16,10 +16,12 @@ def item_id(id_: str) -> bool:
     error_msg = []
     if not isinstance(id_, str):
         error_msg.append("ID should be of type string.")
-    if not re.match(_ALPHANUMERIC, str(id_)):
+    if re.search(_ALPHANUMERIC, str(id_)):
         error_msg.append("Has non-alphnumeric values.")
     if len(str(id_)) != len(secrets.token_hex()):
         error_msg.append("Invalid ID length.")
 
     if error_msg:
         raise ValidationError(error_msg)
+
+    return True
