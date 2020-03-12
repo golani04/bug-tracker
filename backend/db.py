@@ -1,11 +1,6 @@
 import json
+from dataclasses import dataclass, field
 from typing import Dict, List
-from backend.lib.const import ISSUES_PATH, PROJECTS_PATH, USERS_PATH
-
-
-_projects = PROJECTS_PATH
-_issues = ISSUES_PATH
-_users = USERS_PATH
 
 
 def _read_json(path: str) -> List[Dict]:
@@ -19,15 +14,18 @@ def _read_json(path: str) -> List[Dict]:
 def _save_json(path: str, data: List) -> bool:
     try:
         with open(path, mode="w") as f:
-            f.write(json.loads(data))
+            f.write(json.dumps(data))
             return True
     except (IOError, FileExistsError, FileExistsError):
         return False
 
 
-def get_projects() -> List[Dict]:
-    return _read_json(_projects)
+@dataclass
+class DB:
+    config: object = field(default_factory=object)
 
+    def get_projects(self) -> List[Dict]:
+        return _read_json(self.config.PROJECTS_PATH)
 
-def save_projects(projects: List[Dict]) -> bool:
-    return _save_json(_projects, projects)
+    def save_projects(self, projects: List[Dict]) -> bool:
+        return _save_json(self.config.PROJECTS_PATH, projects)
