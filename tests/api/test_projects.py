@@ -1,14 +1,13 @@
 import pytest
 
-from backend import db
+from backend import database as db
 
 
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
 
 @pytest.mark.api
-def test_projects_get(app, projects_json):
-    db._projects = projects_json
+def test_projects_get(app):
     response = app.get("/api/v0/projects")
 
     assert response.status_code == 200
