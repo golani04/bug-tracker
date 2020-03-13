@@ -14,8 +14,21 @@ def get_projects():
 @bp.route("/projects", methods=["POST"])
 def create_project():
     data = request.get_json()
+    error_msg = ""
+    required_keys = {"name", "maintainer"}
+
     if data is None:
-        return bad_request("Missing payload or payload is not json.")
+        error_msg = "Provided data is not a json."
+    elif not data:
+        error_msg = "Received json is empty."
+    elif not required_keys <= set(data):
+        keys = required_keys - set(data)
+        error_msg = (
+            f"Missing required key{'s' if len(keys) > 1 else ''}: {', '.join(sorted(keys))}."
+        )
+
+    if error_msg:
+        return bad_request(error_msg)
 
     project = Project.create(**data)
     project.save()
