@@ -11,6 +11,8 @@ def get_projects():
     return jsonify(Project.get_all_projects()), 200
 
 
+# TODO: create a decorator that will check errors in received json
+#       this decorator will store required keys for validation
 @bp.route("/projects", methods=["POST"])
 def create_project():
     data = request.get_json()
