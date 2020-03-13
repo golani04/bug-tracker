@@ -67,3 +67,12 @@ def test_project_save(app):
     # THEN
     assert project.save() is True
     assert len(Project.get_all_projects()) == length + 1
+
+
+def test_project_failed(app, test_config):
+    # GIVEN
+    db.config = test_config(PROJECTS_PATH="/non-existing-tmp/projects.json")
+    # WHEN
+    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
+    # THEN
+    assert project.save() is False
