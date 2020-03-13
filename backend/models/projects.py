@@ -1,9 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from typing import Dict, List, Union
 
 from flask import escape
-from backend import db
+from backend import database as db
 from backend.models import validate, util
 
 
@@ -42,3 +42,20 @@ class Project:
     @classmethod
     def get_all_projects(cls):
         return db.get_projects()
+
+    @staticmethod
+    def _convert_non_primitive_data_types_to_str(project: Union[Dict, dataclass]):
+        project = project if isinstance(project, dict) else asdict(project)
+        types_to_str = (datetime, date)
+        return {
+            # convert datetime to str
+            k: str(v) if isinstance(v, types_to_str) else v
+            for k, v in project.items()
+        }
+
+    def save(self) -> bool:
+        projects = self.get_all_projects()
+        # add new project to db
+        projects.append(self._convert_non_primitive_data_types_to_str(self))
+
+        return db.save_projects(projects)
