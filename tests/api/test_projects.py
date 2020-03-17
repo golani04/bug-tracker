@@ -12,7 +12,7 @@ def test_projects_get(app):
     assert response.status_code == 200
 
     json = response.get_json()
-    assert set(json[0]) >= {"name", "id", "maintainer", "favorite", "_created", "_updated"}
+    assert set(json[0]) >= {"name", "id", "maintainer", "favorite", "created", "updated"}
 
 
 @pytest.mark.api
@@ -26,14 +26,14 @@ def test_create_project(app):
             "description": "Any description",
         },
     )
-    print(response.get_json())
+
     assert response.status_code == 201
 
     projects = Project.get_all_projects()
     assert length + 1 == len(projects)
 
     project_api = response.get_json()
-    assert any([True for project in projects if project["id"] == project_api["id"]])
+    assert any([True for project in projects if project.id == project_api["id"]])
 
 
 @pytest.mark.api

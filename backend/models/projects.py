@@ -1,6 +1,6 @@
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 
 from flask import escape
 from backend import database as db
@@ -19,8 +19,8 @@ class Project:
         compare=False,
     )
     favorite: bool = field(default=False, metadata="Give a project preference.")
-    _created: date = field(default_factory=date.today, init=False, repr=False)
-    _updated: datetime = field(default_factory=datetime.utcnow, init=False, repr=False)
+    created: date = field(default_factory=date.today, repr=False)
+    updated: datetime = field(default_factory=datetime.utcnow, repr=False)
     # FK, that collect all items that is connected to project
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
@@ -41,21 +41,29 @@ class Project:
 
     @classmethod
     def get_all_projects(cls):
-        return db.get_projects()
+        return [cls(**project) for project in db.get_projects()]
 
     @staticmethod
-    def _convert_non_primitive_data_types_to_str(project: Union[Dict, dataclass]):
-        project = project if isinstance(project, dict) else asdict(project)
-        types_to_str = (datetime, date)
+    def _convert_to_custom_dict(project: "Project") -> Dict:
+        """Convert dataclass to json serializable dict.
+           Exclude fields that should not be stored, and convert the
+           complex types to the type that can be JSON serializable.
+        """
+        _json_not_serializable_types = (datetime, date)
+        _excluded_fields = {"tags", "issues", "users"}
         return {
             # convert datetime to str
-            k: str(v) if isinstance(v, types_to_str) else v
-            for k, v in project.items()
+            k: str(v) if isinstance(v, _json_not_serializable_types) else v
+            for k, v in asdict(project).items()
+            if k not in _excluded_fields
         }
 
     def save(self) -> bool:
         projects = self.get_all_projects()
         # add new project to db
-        projects.append(self._convert_non_primitive_data_types_to_str(self))
+        projects.append(self)
 
-        return db.save_projects(projects)
+        return db.save_projects([project.to_dict() for project in projects])
+
+    def to_dict(self):
+        return self._convert_to_custom_dict(self)
