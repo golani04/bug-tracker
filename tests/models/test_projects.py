@@ -16,8 +16,9 @@ def test_project():
     # GIVEN
     project = Project(_PROJECT_ID, "test", _MAINTAINER_ID, "Testing a project")
     # WHEN
-    # set updated for some reason freezegun didn't work on datetime.utcnow
-    project.updated = datetime.utcnow()  # like this it adds freeze time
+    # set `updated` manually, `freezegun` didn't work on `datetime.utcnow`
+    # this assignment will set value to the value provided in decorator `@freeze_time`
+    project.updated = datetime.utcnow()
     # THEN
     assert project.created == date.today() == date(2020, 1, 1)
     assert project.updated == datetime(2020, 1, 1, 12, 1, 1, 123456)

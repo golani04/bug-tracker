@@ -35,7 +35,7 @@ def create_project():
     project = Project.create(**data)
     project.save()
 
-    return jsonify(project), 201
+    return jsonify(project.to_dict()), 201
 
 
 @bp.route("/projects/<string:project_id>", methods=["GET"])
