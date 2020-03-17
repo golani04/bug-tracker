@@ -41,7 +41,7 @@ class Project:
 
     @classmethod
     def get_all_projects(cls):
-        return db.get_projects()
+        return [cls(**project) for project in db.get_projects()]
 
     @staticmethod
     def _convert_non_primitive_data_types_to_str(project: Union[Dict, dataclass]):
