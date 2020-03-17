@@ -77,3 +77,13 @@ def test_project_failed(app, test_config):
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
     # THEN
     assert project.save() is False
+
+
+def test_find_project(app):
+    project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    assert project is not None
+
+
+def test_find_project_failed(app):
+    project = Project.find_by_id("non-ex1sting-project-1")
+    assert project is None

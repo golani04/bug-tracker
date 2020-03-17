@@ -43,6 +43,14 @@ class Project:
     def get_all_projects(cls):
         return [cls(**project) for project in db.get_projects()]
 
+    @classmethod
+    def find_by_id(cls, id_: str) -> Optional["Project"]:
+        project = [project for project in cls.get_all_projects() if project.id == id_]
+        try:
+            return project.pop()
+        except IndexError:
+            return None
+
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
         """Convert dataclass to json serializable dict.
