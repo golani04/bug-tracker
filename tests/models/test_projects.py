@@ -16,11 +16,11 @@ def test_project():
     # GIVEN
     project = Project(_PROJECT_ID, "test", _MAINTAINER_ID, "Testing a project")
     # WHEN
-    # set _updated for some reason freezegun didn't work on datetime.utcnow
-    project._updated = datetime.utcnow()  # like this it adds freeze time
+    # set updated for some reason freezegun didn't work on datetime.utcnow
+    project.updated = datetime.utcnow()  # like this it adds freeze time
     # THEN
-    assert project._created == date.today() == date(2020, 1, 1)
-    assert project._updated == datetime(2020, 1, 1, 12, 1, 1, 123456)
+    assert project.created == date.today() == date(2020, 1, 1)
+    assert project.updated == datetime(2020, 1, 1, 12, 1, 1, 123456)
     assert project.id == _PROJECT_ID
     assert project.favorite is False  # default
 
@@ -48,7 +48,7 @@ def test_create_project():
     project = Project.create("Test project", _MAINTAINER_ID, "First create")
 
     assert isinstance(project, Project)
-    assert project._created == date(2020, 1, 1)
+    assert project.created == date(2020, 1, 1)
     assert project.maintainer == _MAINTAINER_ID
     assert project.favorite is False
 
