@@ -15,4 +15,4 @@ def _after_req(response):
     return response
 
 
-from . import projects  # noqa
+from .projects import projects  # noqa
