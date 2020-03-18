@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
+from functools import lru_cache
 from typing import Dict, List, Optional
 
 from flask import escape
@@ -40,8 +41,17 @@ class Project:
         return cls(util.create_id(), name, maintainer, description, favorite)
 
     @classmethod
-    def get_all_projects(cls):
+    @lru_cache(1)
+    def get_all_projects(cls) -> List["Project"]:
         return [cls(**project) for project in db.get_projects()]
+
+    @classmethod
+    def find_by_id(cls, id_: str) -> Optional["Project"]:
+        project = [project for project in cls.get_all_projects() if project.id == id_]
+        try:
+            return project.pop()
+        except IndexError:
+            return None
 
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
@@ -62,6 +72,8 @@ class Project:
         projects = self.get_all_projects()
         # add new project to db
         projects.append(self)
+        # clear cache
+        self.get_all_projects.cache_clear()
 
         return db.save_projects([project.to_dict() for project in projects])
 

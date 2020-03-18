@@ -2,9 +2,10 @@ import pytest
 from backend.models.projects import Project
 
 
+_PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
-
+# TODO: In order to speed up the tests, mock DB and check only API
 @pytest.mark.api
 def test_projects_get(app):
     response = app.get("/api/v0/projects")
@@ -68,3 +69,33 @@ def test_create_project_failed(data, expected, app):
 
     error = response.get_json()
     assert error["message"] == expected
+
+
+def test_get_project(app, monkeypatch):
+    monkeypatch.setattr(
+        Project,
+        "find_by_id",
+        lambda _: Project(
+            _PROJECT_ID,
+            "test project",
+            _MAINTAINER_ID,
+            "Monkeypatch a project to test api responses",
+        ),
+    )
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}")
+
+    assert response.status_code == 200
+    project = response.get_json()
+    assert project is not None
+    assert project["id"] == _PROJECT_ID
+
+
+def test_get_project_failed(app, monkeypatch):
+    monkeypatch.setattr(
+        Project, "find_by_id", lambda _: None,
+    )
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}")
+
+    assert response.status_code == 404
+    project = response.get_json()
+    assert project["message"] == "Required project is missing"

@@ -1,7 +1,7 @@
 from flask import jsonify, request
 
 from backend.api import bp
-from backend.api.errors import bad_request
+from backend.api.errors import bad_request, not_found
 
 from backend.models.projects import Project
 
@@ -40,7 +40,10 @@ def create_project():
 
 @bp.route("/projects/<string:project_id>", methods=["GET"])
 def get_project(project_id: str):
-    return jsonify(), 200
+    project = Project.find_by_id(project_id)
+    if project is None:
+        return not_found("Required project is missing")
+    return jsonify(project.to_dict()), 200
 
 
 @bp.route("/projects/<string:project_id>", methods=["PUT", "PATCH"])
