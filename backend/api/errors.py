@@ -21,3 +21,10 @@ def bad_request(
 ) -> Dict[str, Union[int, ErrorMessageType]]:
 
     return error_response(400, message)
+
+
+def not_found(
+    message: ErrorMessageType = "Not found",
+) -> Dict[str, Union[int, ErrorMessageType]]:
+
+    return error_response(404, message)
