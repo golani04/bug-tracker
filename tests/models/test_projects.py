@@ -44,6 +44,43 @@ def test_post_init_escape_html_name():
     assert project.name == "tes&lt;t"
 
 
+def test_get_projects_are_cached(app):
+    # GIVEN
+    get_projects = Project.get_all_projects
+    cache_info = get_projects.cache_info
+    # clear cache before tests
+    get_projects.cache_clear()
+    # WHEN
+    get_projects()
+    info = cache_info()
+    # THEN
+    assert info.hits == 0
+
+    # WHEN
+    get_projects()
+    info = cache_info()
+    # THEN
+    assert info.hits == 1
+
+
+def test_that_cached_cleared(app):
+    # GIVEN
+    get_projects = Project.get_all_projects
+    cache_info = get_projects.cache_info
+    # WHEN
+    get_projects()
+    get_projects()
+    info = cache_info()
+    # THEN
+    assert info.hits > 0
+    # WHEN
+    project = Project.create("Test project", _MAINTAINER_ID, "First create")
+    project.save()
+    info = cache_info()
+    # THEN
+    assert info.hits == 0
+
+
 @freeze_time("2020-1-1")
 def test_create_project():
     project = Project.create("Test project", _MAINTAINER_ID, "First create")
