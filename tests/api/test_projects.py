@@ -4,7 +4,7 @@ from backend.models.projects import Project
 
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
-
+# TODO: In order to speed up the tests, mock DB and check only API
 @pytest.mark.api
 def test_projects_get(app):
     response = app.get("/api/v0/projects")
