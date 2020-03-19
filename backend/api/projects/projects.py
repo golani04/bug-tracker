@@ -1,7 +1,8 @@
-from flask import jsonify, request
+from typing import Dict
+from flask import jsonify
 
 from backend.api import bp
-from backend.api.errors import bad_request, not_found
+from backend.api.util import check_requested_data, check_required_keys, check_item_exists
 
 from backend.models.projects import Project
 
@@ -11,27 +12,10 @@ def get_projects():
     return jsonify(Project.get_all_projects()), 200
 
 
-# TODO: create a decorator that will check errors in received json
-#       this decorator will store required keys for validation
 @bp.route("/projects", methods=["POST"])
-def create_project():
-    data = request.get_json()
-    error_msg = ""
-    required_keys = {"name", "maintainer"}
-
-    if data is None:
-        error_msg = "Provided data is not a json."
-    elif not data:
-        error_msg = "Received json is empty."
-    elif not required_keys <= set(data):
-        keys = required_keys - set(data)
-        error_msg = (
-            f"Missing required key{'s' if len(keys) > 1 else ''}: {', '.join(sorted(keys))}."
-        )
-
-    if error_msg:
-        return bad_request(error_msg)
-
+@check_requested_data
+@check_required_keys({"name", "maintainer"})
+def create_project(data: Dict):
     project = Project.create(**data)
     project.save()
 
@@ -39,18 +23,19 @@ def create_project():
 
 
 @bp.route("/projects/<string:project_id>", methods=["GET"])
-def get_project(project_id: str):
-    project = Project.find_by_id(project_id)
-    if project is None:
-        return not_found("Required project is missing")
+@check_item_exists(Project, "Required project is missing")
+def get_project(project: Project):
     return jsonify(project.to_dict()), 200
 
 
 @bp.route("/projects/<string:project_id>", methods=["PUT", "PATCH"])
-def update_project(project_id: str):
+@check_requested_data
+@check_item_exists(Project, "Required project is missing")
+def update_project(project: Project):
     return jsonify(), 200
 
 
 @bp.route("/projects/<string:project_id>", methods=["DELETE"])
-def delete_project(project_id: str):
+@check_item_exists(Project, "Required project is missing")
+def delete_project(project: Project):
     return jsonify(), 200
