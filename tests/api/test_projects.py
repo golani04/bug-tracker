@@ -61,11 +61,22 @@ def test_create_project(app):
             "Missing required key: maintainer.",
         ),
         ({"json": {"description": "Any description"}}, "Missing required keys: maintainer, name."),
+        (
+            {
+                "json": {
+                    "name": "Test through an API.",
+                    "maintainer": _MAINTAINER_ID,
+                    "description": "Any description",
+                }
+            },
+            "Internal Server Error",
+        ),
     ],
 )
-def test_create_project_failed(data, expected, app):
+def test_create_project_failed(data, expected, app, monkeypatch):
+    monkeypatch.setattr(Project, "save", lambda _: False)
     response = app.post("/api/v0/projects", **data)
-    assert response.status_code == 400
+    assert response.status_code in {400, 500}
 
     error = response.get_json()
     assert error["message"] == expected
