@@ -53,6 +53,19 @@ class Project:
         except IndexError:
             return None
 
+    @classmethod
+    def delete(cls, id_: str) -> bool:
+        projects = cls.get_all_projects()
+        length_before_delete = len(projects)
+        # remove project by exluding given id
+        projects = [project for project in projects if project.id != id_]
+
+        if length_before_delete <= len(projects):
+            raise ValueError
+        # clear cache because of the removed project
+        cls.get_all_projects.cache_clear()
+        return db.save_projects([project.to_dict() for project in projects])
+
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
         """Convert dataclass to json serializable dict.

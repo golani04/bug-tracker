@@ -114,3 +114,13 @@ def test_find_project(app):
 def test_find_project_failed(app):
     project = Project.find_by_id("non-ex1sting-project-1")
     assert project is None
+
+
+def test_delete_project(app):
+    project = Project.delete("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    assert project is not None
+
+
+def test_delete_project_failed(app):
+    with pytest.raises(ValueError):
+        Project.delete("none-existing-id")
