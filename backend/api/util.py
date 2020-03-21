@@ -45,12 +45,12 @@ def check_required_keys(required_keys: Set) -> Callable:
 def check_item_exists(model: Union[Project], error_msg: str) -> Callable:
     def wrapper(route_func: Callable) -> Callable:
         @wraps(route_func)
-        def inner_wrapper(project_id: str) -> Union[Project]:
+        def inner_wrapper(project_id: str, *args, **kwargs) -> Union[Project]:
             item = model.find_by_id(project_id)
             if item is None:
                 return not_found(error_msg)
 
-            return route_func(item)
+            return route_func(item, *args, **kwargs)
 
         return inner_wrapper
 
