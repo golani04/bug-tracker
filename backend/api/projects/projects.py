@@ -2,7 +2,7 @@ from typing import Dict
 from flask import jsonify
 
 from backend.api import bp
-from backend.api.errors import error_response
+from backend.api.errors import error_response, not_found
 from backend.api.util import check_requested_data, check_required_keys, check_item_exists
 
 from backend.models.projects import Project
@@ -38,6 +38,13 @@ def update_project(project: Project):
 
 
 @bp.route("/projects/<string:project_id>", methods=["DELETE"])
-@check_item_exists(Project, "Required project is missing")
-def delete_project(project: Project):
-    return jsonify(), 200
+def delete_project(project_id: str):
+    try:
+        result = Project.delete(project_id)
+    except ValueError:
+        return not_found("Required project is missing")
+
+    if result is False:
+        return error_response(500)
+
+    return jsonify(), 204

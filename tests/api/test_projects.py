@@ -74,6 +74,7 @@ def test_create_project(app):
     ],
 )
 def test_create_project_failed(data, expected, app, monkeypatch):
+    # 500: an error produce by the database
     monkeypatch.setattr(Project, "save", lambda _: False)
     response = app.post("/api/v0/projects", **data)
     assert response.status_code in {400, 500}
@@ -110,3 +111,32 @@ def test_get_project_failed(app, monkeypatch):
     assert response.status_code == 404
     project = response.get_json()
     assert project["message"] == "Required project is missing"
+
+
+def test_project_delete(app, monkeypatch):
+    monkeypatch.setattr(
+        Project, "delete", lambda _: True,
+    )
+
+    response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
+    assert response.status_code == 204
+
+
+def test_project_delete_404(app, monkeypatch):
+    def mock_value_error(_):
+        raise ValueError
+
+    monkeypatch.setattr(Project, "delete", mock_value_error)
+    response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
+
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required project is missing"
+
+
+def test_project_delete_500(app, monkeypatch):
+    # an error produce by the database
+    monkeypatch.setattr(Project, "delete", lambda _: False)
+    response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
+
+    assert response.status_code == 500
+    assert response.get_json()["message"] == "Internal Server Error"
