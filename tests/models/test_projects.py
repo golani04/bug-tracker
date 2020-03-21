@@ -124,3 +124,31 @@ def test_delete_project(app):
 def test_delete_project_failed(app):
     with pytest.raises(ValueError):
         Project.delete("none-existing-id")
+
+
+@freeze_time("2020-01-01 12:00:00.1234")
+def test_modify_project(app):
+    # GIVEN
+    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
+    prev_name = project.name
+    prev_description = project.description
+    # WHEN
+    updated_project = project.modify(
+        {"name": "Name is changed", "description": "New desc for a project"}
+    )
+    # THEN
+    assert project is not updated_project
+    assert prev_name == "tes&lt;t"
+    assert prev_name != updated_project.name
+    assert prev_description == "Testing a project"
+    assert prev_description != updated_project.description
+    assert updated_project.updated == datetime(2020, 1, 1, 12, 0, 0, 123400)
+
+
+def test_modify_project_id_is_not_changed(app):
+    # GIVEN
+    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
+    # WHEN
+    updated_project = project.modify({"id": "a" * 64})
+    # THEN
+    assert project.id == updated_project.id == _PROJECT_ID != "a" * 64

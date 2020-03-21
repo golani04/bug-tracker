@@ -1,7 +1,7 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime
 from functools import lru_cache
-from typing import Dict, List, Optional
+from typing import ClassVar, Dict, List, Set, Optional
 
 from flask import escape
 from backend import database as db
@@ -26,6 +26,8 @@ class Project:
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     issues: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
+    # define class variable
+    unchangeable_props: ClassVar[Set] = {"id", "created", "updated"}
 
     def __post_init__(self):
         validate.item_id(self.id)
@@ -89,6 +91,11 @@ class Project:
         self.get_all_projects.cache_clear()
 
         return db.save_projects([project.to_dict() for project in projects])
+
+    def modify(self, data: Dict) -> "Project":
+        data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
+        data["updated"] = datetime.utcnow()
+        return replace(self, **data)
 
     def to_dict(self):
         return self._convert_to_custom_dict(self)
