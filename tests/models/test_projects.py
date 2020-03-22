@@ -74,7 +74,7 @@ def test_that_cached_cleared(app):
     assert info.hits > 0
     # WHEN
     project = Project.create("Test project", _MAINTAINER_ID, "First create")
-    project.save()
+    project.save("create")
     info = cache_info()
     # THEN
     assert info.hits == 0
