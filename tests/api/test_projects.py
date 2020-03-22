@@ -34,6 +34,20 @@ def del_project(find_by_id, monkeypatch):
     )
 
 
+@pytest.fixture
+def mod_project(find_by_id, monkeypatch):
+    monkeypatch.setattr(
+        Project,
+        "modify",
+        lambda *_: Project(
+            _PROJECT_ID,
+            "test project",
+            _MAINTAINER_ID,
+            "Monkeypatch a project to test api responses",
+        ),
+    )
+
+
 @pytest.mark.api
 def test_projects_get(app):
     response = app.get("/api/v0/projects")
@@ -152,6 +166,32 @@ def test_project_delete_500(app, del_project, monkeypatch):
     # an error produce by the database
     monkeypatch.setattr(Project, "save", lambda *_: False)
     response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
+
+    assert response.status_code == 500
+    assert response.get_json()["message"] == "Internal Server Error"
+
+
+@pytest.mark.api
+def test_modify_project(app, mod_project):
+    response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
+
+    assert response.status_code == 200
+
+
+@pytest.mark.api
+def test_project_modify_404(app, monkeypatch):
+    monkeypatch.setattr(Project, "find_by_id", lambda *_: None)
+    response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
+
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required project is missing"
+
+
+@pytest.mark.api
+def test_project_modify_500(app, del_project, monkeypatch):
+    # an error produce by the database
+    monkeypatch.setattr(Project, "save", lambda *_: False)
+    response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
 
     assert response.status_code == 500
     assert response.get_json()["message"] == "Internal Server Error"

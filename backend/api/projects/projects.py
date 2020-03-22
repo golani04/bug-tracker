@@ -35,13 +35,13 @@ def get_project(project: Project):
     return jsonify(project.to_dict()), 200
 
 
-@bp.route("/projects/<string:project_id>", methods=["PUT", "PATCH"])
+@bp.route("/projects/<string:project_id>", methods=["PATCH"])
 @check_requested_data
 @filter_unchangeable_keys(Project.unchangeable_props)
 @check_item_exists(Project, "Required project is missing")
 def update_project(project: Project, data: Dict):
-    project = project.modify(**data)
-    if project.save() is False:
+    project = project.modify(data)
+    if project.save("modify") is False:
         return error_response(500)
 
     return jsonify(project.to_dict()), 200
