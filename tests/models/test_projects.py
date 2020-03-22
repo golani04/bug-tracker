@@ -102,7 +102,7 @@ def test_project_save(app):
     # WHEN
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
     # THEN
-    assert project.save() is True
+    assert project.save("create") is True
     assert len(Project.get_all_projects()) == length + 1
 
 
@@ -117,13 +117,9 @@ def test_find_project_failed(app):
 
 
 def test_delete_project(app):
-    project = Project.delete("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
-    assert project is not None
-
-
-def test_delete_project_failed(app):
-    with pytest.raises(ValueError):
-        Project.delete("none-existing-id")
+    project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    assert project.delete() is not None
+    assert any(project_id == project.id for project_id in Project.get_all_projects()) is False
 
 
 @freeze_time("2020-01-01 12:00:00.1234")

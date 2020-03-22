@@ -45,28 +45,11 @@ class Project:
     @classmethod
     @lru_cache(1)
     def get_all_projects(cls) -> List["Project"]:
-        return [cls(**project) for project in db.get_projects()]
+        return {project["id"]: cls(**project) for project in db.get_projects()}
 
     @classmethod
     def find_by_id(cls, id_: str) -> Optional["Project"]:
-        project = [project for project in cls.get_all_projects() if project.id == id_]
-        try:
-            return project.pop()
-        except IndexError:
-            return None
-
-    @classmethod
-    def delete(cls, id_: str) -> bool:
-        projects = cls.get_all_projects()
-        length_before_delete = len(projects)
-        # remove project by exluding given id
-        projects = [project for project in projects if project.id != id_]
-
-        if length_before_delete <= len(projects):
-            raise ValueError
-        # clear cache because of the removed project
-        cls.get_all_projects.cache_clear()
-        return db.save_projects([project.to_dict() for project in projects])
+        return cls.get_all_projects().get(id_)
 
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
@@ -83,19 +66,23 @@ class Project:
             if k not in _excluded_fields
         }
 
-    def save(self) -> bool:
-        projects = self.get_all_projects()
-        # add new project to db
-        projects.append(self)
-        # clear cache
-        self.get_all_projects.cache_clear()
+    def to_dict(self) -> Dict:
+        return self._convert_to_custom_dict(self)
 
-        return db.save_projects([project.to_dict() for project in projects])
+    def delete(self) -> "Project":
+        return self.get_all_projects().pop(self.id)
 
     def modify(self, data: Dict) -> "Project":
         data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
         data["updated"] = datetime.utcnow()
         return replace(self, **data)
 
-    def to_dict(self):
-        return self._convert_to_custom_dict(self)
+    def save(self, state: str = None) -> bool:
+        projects = self.get_all_projects()
+        if state in {"create", "modify"}:
+            projects[self.id] = self
+
+        # clear cache
+        self.get_all_projects.cache_clear()
+
+        return db.save_projects([project.to_dict() for project in projects.values()])
