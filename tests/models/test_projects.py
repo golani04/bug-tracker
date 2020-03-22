@@ -2,7 +2,6 @@ import pytest
 from datetime import date, datetime
 from freezegun import freeze_time
 
-from backend import database as db
 from backend.models.projects import Project
 from backend.models.validate import ValidationError
 
@@ -75,7 +74,7 @@ def test_that_cached_cleared(app):
     assert info.hits > 0
     # WHEN
     project = Project.create("Test project", _MAINTAINER_ID, "First create")
-    project.save()
+    project.save("create")
     info = cache_info()
     # THEN
     assert info.hits == 0
@@ -103,17 +102,8 @@ def test_project_save(app):
     # WHEN
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
     # THEN
-    assert project.save() is True
+    assert project.save("create") is True
     assert len(Project.get_all_projects()) == length + 1
-
-
-def test_project_failed(app, test_config):
-    # GIVEN
-    db.config = test_config(PROJECTS_PATH="/non-existing-tmp/projects.json")
-    # WHEN
-    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
-    # THEN
-    assert project.save() is False
 
 
 def test_find_project(app):
@@ -124,3 +114,37 @@ def test_find_project(app):
 def test_find_project_failed(app):
     project = Project.find_by_id("non-ex1sting-project-1")
     assert project is None
+
+
+def test_delete_project(app):
+    project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    assert project.delete() is not None
+    assert any(project_id == project.id for project_id in Project.get_all_projects()) is False
+
+
+@freeze_time("2020-01-01 12:00:00.1234")
+def test_modify_project(app):
+    # GIVEN
+    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
+    prev_name = project.name
+    prev_description = project.description
+    # WHEN
+    updated_project = project.modify(
+        {"name": "Name is changed", "description": "New desc for a project"}
+    )
+    # THEN
+    assert project is not updated_project
+    assert prev_name == "tes&lt;t"
+    assert prev_name != updated_project.name
+    assert prev_description == "Testing a project"
+    assert prev_description != updated_project.description
+    assert updated_project.updated == datetime(2020, 1, 1, 12, 0, 0, 123400)
+
+
+def test_modify_project_id_is_not_changed(app):
+    # GIVEN
+    project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
+    # WHEN
+    updated_project = project.modify({"id": "a" * 64})
+    # THEN
+    assert project.id == updated_project.id == _PROJECT_ID != "a" * 64

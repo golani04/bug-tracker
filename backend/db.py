@@ -7,7 +7,7 @@ def _read_json(path: str) -> List[Dict]:
     try:
         with open(path, mode="r") as f:
             return json.loads(f.read())
-    except (IOError, FileExistsError, FileExistsError):
+    except IOError:
         return []
 
 
@@ -16,7 +16,7 @@ def _save_json(path: str, data: List) -> bool:
         with open(path, mode="w") as f:
             f.write(json.dumps(data))
             return True
-    except (IOError, FileExistsError, FileExistsError):
+    except IOError:
         return False
 
 
