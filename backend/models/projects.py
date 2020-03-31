@@ -22,6 +22,7 @@ class Project:
     favorite: bool = field(default=False, metadata="Give a project preference.")
     created: date = field(default_factory=date.today, repr=False)
     updated: datetime = field(default_factory=datetime.utcnow, repr=False)
+    # TODO: access - private, public, limited
     # FK, that collect all items that is connected to project
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
