@@ -1,6 +1,7 @@
 import re
 import secrets
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Union
 
 
@@ -23,5 +24,18 @@ def item_id(id_: str) -> bool:
 
     if error_msg:
         raise ValidationError(error_msg)
+
+    return True
+
+
+def is_enum_has_prop(enum_obj: Enum, enum_prop: Union[Enum, int]) -> bool:
+    error = True
+    if isinstance(enum_prop, int):
+        error = not any(prop.value == enum_prop for prop in enum_obj)
+    elif isinstance(enum_prop, Enum):
+        error = enum_prop not in enum_obj
+
+    if error:
+        raise ValidationError("This {} is missing {}".format(enum_obj, enum_prop))
 
     return True

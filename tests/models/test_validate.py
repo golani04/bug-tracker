@@ -1,5 +1,21 @@
+from enum import Enum
 import pytest
 from backend.models import validate
+
+
+EnumObj = Enum("EnumObj", "one two three")
+AnotherTestEnum = Enum("AnotherTestEnum", "one two three")
+
+
+def test_validate_enum():
+    assert validate.is_enum_has_prop(EnumObj, 1)
+    assert validate.is_enum_has_prop(EnumObj, EnumObj.one)
+
+
+@pytest.mark.parametrize("value", ["asdfasdf", "1", 4, AnotherTestEnum.one])
+def test_validate_enum_fail(value):
+    with pytest.raises(validate.ValidationError):
+        validate.is_enum_has_prop(EnumObj, value)
 
 
 test_id = "123456abcdefghijklmnopqrstuvwxyz" * 2
