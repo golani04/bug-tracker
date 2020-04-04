@@ -13,13 +13,13 @@ class ValidationError(Exception):
 
 
 def item_id(id_: str) -> bool:
-    error_msg = []
+    error_msg = ""
     if not isinstance(id_, str):
-        error_msg.append("ID should be of type string.")
-    if re.search(_ALPHANUMERIC, str(id_)):
-        error_msg.append("Has non-alphnumeric values.")
-    if len(str(id_)) != len(secrets.token_hex()):
-        error_msg.append("Invalid ID length.")
+        error_msg = "ID should be of type string."
+    elif len(id_) != len(secrets.token_hex()):
+        error_msg = "Invalid ID length."
+    elif re.search(_ALPHANUMERIC, id_):
+        error_msg = "Has non-alphnumeric values."
 
     if error_msg:
         raise ValidationError(error_msg)

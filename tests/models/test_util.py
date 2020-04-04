@@ -25,17 +25,3 @@ def test_create_random_ids():
 
 def test_create_id_is_valid():
     assert validate.item_id(create_id())
-
-
-def test_create_id_not_valid_pass_num():
-    with pytest.raises(validate.ValidationError) as excinfo:
-        validate.item_id(0)
-
-    assert set(excinfo.value.args[0]) == {"ID should be of type string.", "Invalid ID length."}
-
-
-def test_create_id_not_valid_not_alphnumeric():
-    with pytest.raises(validate.ValidationError) as excinfo:
-        validate.item_id("12345adfgasg-")
-
-    assert set(excinfo.value.args[0]) == {"Has non-alphnumeric values.", "Invalid ID length."}
