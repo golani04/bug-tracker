@@ -1,9 +1,12 @@
+from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
 from enum import Enum
-from typing import ClassVar, List, Set
+from functools import lru_cache
+from typing import ClassVar, Dict, List, Set
 
 from flask import escape
-from backend.models import validate
+from backend import database as db
+from backend.models import util, validate
 
 
 Severity = Enum("Severity", "low medium high")
@@ -52,3 +55,30 @@ class Issue:
         # timedelta seconds to timedelta
         self.time_spent = timedelta(seconds=self.time_spent)
 
+    @classmethod
+    @lru_cache(1)
+    def get_all(cls) -> List["Issue"]:
+        return {issue["id"]: cls(**issue) for issue in db.get_issues()}
+
+    @staticmethod
+    def _convert_to_custom_dict(project: "Issue") -> Dict:
+        """Convert dataclass to json serializable dict.
+           Exclude fields that should not be stored, and convert the
+           complex types to the type that can be JSON serializable.
+        """
+
+        def serialize_values(val):
+            _stringify_this_types = (date,)
+            if isinstance(val, _stringify_this_types):
+                return str(val)
+            if isinstance(val, Enum):
+                return val.value
+            if isinstance(val, timedelta):
+                return util.seconds_to_wdhms(val)
+
+            return val
+
+        return {k: serialize_values(v) for k, v in asdict(project).items()}
+
+    def to_dict(self) -> Dict:
+        return self._convert_to_custom_dict(self)
