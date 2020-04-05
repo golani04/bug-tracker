@@ -94,3 +94,24 @@ class Issue:
 
     def to_dict(self) -> Dict:
         return self._convert_to_custom_dict(self)
+
+    @classmethod
+    def create(cls, new_issue: Dict) -> "Issue":
+        new_issue = {**new_issue, "id": util.create_id(), "created": date.today()}
+        return cls(**new_issue)
+
+    def delete(self):
+        pass
+
+    def modify(self):
+        pass
+
+    def save(self, state: str):
+        issues = self.get_all()
+        if state in {"create", "modify"}:
+            issues[self.id] = self
+
+        # clear cache
+        self.get_all.cache_clear()
+
+        return db.save_issues([issue.to_dict() for issue in issues.values()])
