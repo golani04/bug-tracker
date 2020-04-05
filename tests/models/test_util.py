@@ -1,6 +1,8 @@
+from enum import Enum
+
 import pytest
 from backend.models import validate
-from backend.models.util import create_id
+from backend.models.util import create_id, value_to_enum
 
 
 @pytest.mark.xfail
@@ -25,3 +27,18 @@ def test_create_random_ids():
 
 def test_create_id_is_valid():
     assert validate.item_id(create_id())
+
+
+EnumObj = Enum("EnumObj", "one two three")
+
+
+@pytest.mark.parametrize("value, expected", [(EnumObj.one, EnumObj.one), (1, EnumObj.one)])
+def test_value_to_enum(value, expected):
+    assert value_to_enum(EnumObj, value) == expected
+
+
+def test_value_to_enum_fails():
+    with pytest.raises(ValueError) as excinfo:
+        value_to_enum(EnumObj, "1")
+
+    assert str(excinfo.value) == "'1' is not a valid EnumObj"
