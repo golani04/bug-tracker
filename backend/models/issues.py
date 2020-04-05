@@ -45,6 +45,9 @@ class Issue:
         validate.is_enum_has_prop(Severity, self.severity)
         validate.is_enum_has_prop(Status, self.status)
         validate.is_enum_has_prop(Label, self.label)
+        validate.is_numeric(self.time_spent)
+        validate.is_date(self.created)
+        self.due and validate.is_date(self.due)  # allowed to be None
         # convert unallowed signs to html codes
         self.title = escape(self.title)
         self.description = escape(self.description)
@@ -53,7 +56,16 @@ class Issue:
         self.status = util.value_to_enum(Status, self.status)
         self.label = util.value_to_enum(Label, self.label)
         # timedelta seconds to timedelta
-        self.time_spent = timedelta(seconds=self.time_spent)
+        self.time_spent = timedelta(seconds=(self.time_spent or 0))
+        # convert str to dates
+        self.created = (
+            self.created if isinstance(self.created, date) else date.fromisoformat(self.created)
+        )
+        self.due = (
+            self.due
+            if isinstance(self.created, date)
+            else (self.due and date.fromisoformat(self.due))
+        )  # allowed to be None
 
     @classmethod
     @lru_cache(1)
