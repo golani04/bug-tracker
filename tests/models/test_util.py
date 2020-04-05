@@ -1,8 +1,9 @@
+from datetime import timedelta
 from enum import Enum
 
 import pytest
 from backend.models import validate
-from backend.models.util import create_id, value_to_enum
+from backend.models.util import create_id, value_to_enum, seconds_to_wdhms
 
 
 @pytest.mark.xfail
@@ -42,3 +43,31 @@ def test_value_to_enum_fails():
         value_to_enum(EnumObj, "1")
 
     assert str(excinfo.value) == "'1' is not a valid EnumObj"
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (
+            timedelta(days=25, hours=26, minutes=80, seconds=1000),
+            {"weeks": 3, "days": 5, "hours": 3, "minutes": 36, "seconds": 40},
+        ),
+        (
+            timedelta(hours=1, seconds=1),
+            {"weeks": 0, "days": 0, "hours": 1, "minutes": 0, "seconds": 1},
+        ),
+    ],
+)
+def test_td_convertion_to_wdhms(value, expected):
+    assert seconds_to_wdhms(value) == expected
+
+
+def test_td_convertion_fails():
+    value = 18000
+    with pytest.raises(ValueError) as excinfo:
+        seconds_to_wdhms(value)
+
+    assert str(excinfo.value) == (
+        f"Incorrect type of variable is passed. Provided type: {type(value)} "
+        "and should be of timedelta type."
+    )
