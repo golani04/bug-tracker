@@ -29,3 +29,9 @@ class DB:
 
     def save_projects(self, projects: List[Dict]) -> bool:
         return _save_json(self.config.PROJECTS_PATH, projects)
+
+    def get_issues(self) -> List[Dict]:
+        return _read_json(self.config.ISSUES_PATH)
+
+    def save_issues(self, issues: List[Dict]) -> bool:
+        return _save_json(self.config.ISSUES_PATH, issues)
