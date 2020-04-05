@@ -25,18 +25,6 @@ def test_project():
     assert project.favorite is False  # default
 
 
-def test_post_init_id_not_str():
-    with pytest.raises(ValidationError):
-        # id is not of type str
-        Project(123456, "tes<t", _MAINTAINER_ID, "Testing a project")
-
-
-def test_post_init_not_len():
-    with pytest.raises(ValidationError):
-        # id is not of type str
-        Project(_PROJECT_ID[0:10], "tes<t", _MAINTAINER_ID, "Testing a project")
-
-
 def test_post_init_escape_html_name():
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
 
