@@ -1,4 +1,6 @@
+from datetime import date, datetime
 from enum import Enum
+
 import pytest
 from backend.models import validate
 
@@ -56,3 +58,38 @@ def test_validate_id_fail_not_alphanumeric(value, err_msg):
     with pytest.raises(validate.ValidationError) as excinfo:
         validate.item_id(value)
     assert str(excinfo.value) == err_msg
+
+
+@pytest.mark.parametrize("date_", ["2020-04-01", date(2020, 4, 1)])
+def test_date(date_):
+    assert validate.is_date(date_)
+
+
+@pytest.mark.parametrize("date_", ["2020-13-01", "sadfsd", (2020, 1, 1)])
+def test_date_fail(date_):
+    with pytest.raises(validate.ValidationError):
+        validate.is_date(date_)
+
+
+@pytest.mark.parametrize("datetime_", ["2020-04-01 18:00:00", datetime(2020, 4, 1, 18, 0, 0)])
+def test_datetime(datetime_):
+    assert validate.is_datetime(datetime_)
+
+
+@pytest.mark.parametrize(
+    "datetime_", ["2020-13-01 18:00:00", "2020-01-01 25:00:00", "sadfsd", (2020, 1, 1)]
+)
+def test_datetime_fail(datetime_):
+    with pytest.raises(validate.ValidationError):
+        validate.is_datetime(datetime_)
+
+
+@pytest.mark.parametrize("num", [1, 1.1, 0, 0.2, False])
+def test_numeric(num):
+    assert validate.is_numeric(num)
+
+
+@pytest.mark.parametrize("num", ["1", "False", [], {}, (1,)])
+def test_numeric_fail(num):
+    with pytest.raises(validate.ValidationError):
+        validate.is_numeric(num)
