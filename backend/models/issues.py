@@ -61,7 +61,7 @@ class Issue:
         return {issue["id"]: cls(**issue) for issue in db.get_issues()}
 
     @staticmethod
-    def _convert_to_custom_dict(project: "Issue") -> Dict:
+    def _convert_to_custom_dict(issue: "Issue") -> Dict:
         """Convert dataclass to json serializable dict.
            Exclude fields that should not be stored, and convert the
            complex types to the type that can be JSON serializable.
@@ -78,7 +78,7 @@ class Issue:
 
             return val
 
-        return {k: serialize_values(v) for k, v in asdict(project).items()}
+        return {k: serialize_values(v) for k, v in asdict(issue).items()}
 
     def to_dict(self) -> Dict:
         return self._convert_to_custom_dict(self)
