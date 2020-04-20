@@ -8,9 +8,7 @@ _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
 
 def test_issue_model():
-    issue = Issue(
-        _ISSUE_ID, "Lorem ipsum dolor", _MAINTAINER_ID, _MAINTAINER_ID, _PROJECT_ID
-    )
+    issue = Issue(_ISSUE_ID, "Lorem ipsum dolor", _MAINTAINER_ID, _MAINTAINER_ID, _PROJECT_ID)
 
     assert is_dataclass(issue)
     # test random enum object
