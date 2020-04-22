@@ -33,9 +33,16 @@ class Project:
     def __post_init__(self):
         validate.item_id(self.id)
         validate.item_id(self.maintainer)
+        validate.is_date(self.created)
+        validate.is_datetime(self.updated)
         # convert unallowed signs to html codes
         self.name = escape(self.name)
         self.description = escape(self.description)
+        # least needed property, don't raise ValidationError, assign default value
+        self.favorite = self.favorite if isinstance(self.favorite, bool) else False
+        # convert str to date[time] formats
+        self.created = util.set_date(self.created, date)
+        self.updated = util.set_datetime(self.updated)
 
     @classmethod
     def create(
