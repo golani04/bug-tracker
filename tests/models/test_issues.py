@@ -5,6 +5,8 @@ from backend.models.issues import Issue, Severity
 _ISSUE_ID = "567890abcdefghijklmnopqrstuvwxyz" * 2
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
+# in demo data issues randomly taken from the list
+_EXISTING_ISSUE_ID = "a1c728c5e9680804ea35b234e04b60e91aad32d375b3a1cbb6b035be69221a1e"
 
 
 def test_issue_model():
@@ -29,3 +31,18 @@ def test_issue_to_dict_method(app):
 
     assert issue.id == issue_dict["id"]
     assert issue.severity.value == issue_dict["severity"]
+
+
+def test_find_by_id(app):
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+
+    assert issue is not None
+    assert is_dataclass(issue)
+    assert issue.id == _EXISTING_ISSUE_ID
+
+
+def test_find_by_id_that_not_exist(app):
+    # _ISSUE_ID is not exising id that used for tests
+    issue = Issue.find_by_id(_ISSUE_ID)
+
+    assert issue is None

@@ -2,7 +2,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
 from enum import Enum
 from functools import lru_cache
-from typing import ClassVar, Dict, List, Set
+from typing import ClassVar, Dict, List, Optional, Set
 
 from flask import escape
 from backend import database as db
@@ -37,6 +37,7 @@ class Issue:
     unchangeable_props: ClassVar[Set] = {"id", "created", "project", "reporter"}
 
     def __post_init__(self):
+        # validate props
         validate.item_id(self.id)
         validate.item_id(self.assignee)
         validate.item_id(self.reporter)
@@ -48,6 +49,7 @@ class Issue:
         validate.is_numeric(self.time_spent)
         validate.is_date(self.created)
         self.due and validate.is_date(self.due)  # allowed to be None
+        # transform props to required formats
         # convert unallowed signs to html codes
         self.title = escape(self.title)
         self.description = escape(self.description)
@@ -99,6 +101,10 @@ class Issue:
     def create(cls, new_issue: Dict) -> "Issue":
         new_issue = {**new_issue, "id": util.create_id(), "created": date.today()}
         return cls(**new_issue)
+
+    @classmethod
+    def find_by_id(cls, id_: str) -> Optional["Issue"]:
+        return cls.get_all().get(id_)
 
     def delete(self):
         pass
