@@ -41,14 +41,8 @@ class Project:
         # least needed property, don't raise ValidationError, assign default value
         self.favorite = self.favorite if isinstance(self.favorite, bool) else False
         # convert str to date[time] formats
-        self.created = (
-            self.created if isinstance(self.created, date) else date.fromisoformat(self.created)
-        )
-        self.updated = (
-            self.updated
-            if isinstance(self.updated, datetime)
-            else datetime.fromisoformat(self.updated)
-        )
+        self.created = util.set_date(self.created, date)
+        self.updated = util.set_datetime(self.updated)
 
     @classmethod
     def create(

@@ -60,14 +60,8 @@ class Issue:
         # timedelta seconds to timedelta
         self.time_spent = timedelta(seconds=(self.time_spent or 0))
         # convert str to dates
-        self.created = (
-            self.created if isinstance(self.created, date) else date.fromisoformat(self.created)
-        )
-        self.due = (
-            self.due
-            if isinstance(self.created, date)
-            else (self.due and date.fromisoformat(self.due))
-        )  # allowed to be None
+        self.created = util.set_date(self.created)
+        self.due = util.set_date(self.due, allowed_none=True)
 
     @classmethod
     @lru_cache(1)
