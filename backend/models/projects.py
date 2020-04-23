@@ -83,6 +83,7 @@ class Project:
     def modify(self, data: Dict) -> "Project":
         data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
         data["updated"] = datetime.utcnow()
+        # using `replace` will also invoke post init where the validation runs
         return replace(self, **data)
 
     def save(self, state: str = None) -> bool:
