@@ -102,7 +102,7 @@ class Issue:
         return cls.get_all().get(id_)
 
     def delete(self):
-        pass
+        return self.get_all().pop(self.id)
 
     def modify(self):
         pass

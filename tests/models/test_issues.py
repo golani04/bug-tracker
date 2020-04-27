@@ -46,3 +46,33 @@ def test_find_by_id_that_not_exist(app):
     issue = Issue.find_by_id(_ISSUE_ID)
 
     assert issue is None
+
+
+def test_issue_delete_without_save_missing_in_db(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # when #
+    issue.delete()
+    # then
+    assert Issue.get_all().get(issue.id) is None
+    # when, check that DB did not changed
+    Issue.get_all.cache_clear()
+    # then
+    assert Issue.get_all().get(issue.id) == issue
+
+
+def test_issue_delete(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    issue.delete()
+    # when, call save method to register it to DB
+    issue.save("delete")
+    # then
+    assert Issue.get_all().get(issue.id) is None
+
+
+def test_issue_delete_none(app):
+    issue = Issue.find_by_id(_ISSUE_ID)
+    assert issue is None
