@@ -46,7 +46,8 @@ class Issue:
         validate.is_enum_has_prop(Severity, self.severity)
         validate.is_enum_has_prop(Status, self.status)
         validate.is_enum_has_prop(Label, self.label)
-        validate.is_numeric(self.time_spent)
+        # TODO: convert dict to int
+        # validate.is_numeric(self.time_spent)
         validate.is_date(self.created)
         self.due and validate.is_date(self.due)  # allowed to be None
         # transform props to required formats
@@ -58,7 +59,7 @@ class Issue:
         self.status = util.value_to_enum(Status, self.status)
         self.label = util.value_to_enum(Label, self.label)
         # timedelta seconds to timedelta
-        self.time_spent = timedelta(seconds=(self.time_spent or 0))
+        self.time_spent = util.wdhms_to_seconds(self.time_spent)
         # convert str to dates
         self.created = util.set_date(self.created)
         self.due = util.set_date(self.due, allowed_none=True)
