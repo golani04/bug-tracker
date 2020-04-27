@@ -3,7 +3,7 @@ from enum import Enum
 
 import pytest
 from backend.models import validate
-from backend.models.util import create_id, value_to_enum, seconds_to_wdhms
+from backend.models import util
 
 
 @pytest.mark.xfail
@@ -18,16 +18,16 @@ def test_to_show_to_compare_each_with_each():
 
 # see why using 2 asserts, see previous test
 def test_create_random_ids():
-    id0 = create_id()
-    id1 = create_id()
-    id2 = create_id()
+    id0 = util.create_id()
+    id1 = util.create_id()
+    id2 = util.create_id()
 
     assert id0 != id1 != id2
     assert id0 != id2
 
 
 def test_create_id_is_valid():
-    assert validate.item_id(create_id())
+    assert validate.item_id(util.create_id())
 
 
 EnumObj = Enum("EnumObj", "one two three")
@@ -35,12 +35,12 @@ EnumObj = Enum("EnumObj", "one two three")
 
 @pytest.mark.parametrize("value, expected", [(EnumObj.one, EnumObj.one), (1, EnumObj.one)])
 def test_value_to_enum(value, expected):
-    assert value_to_enum(EnumObj, value) == expected
+    assert util.value_to_enum(EnumObj, value) == expected
 
 
 def test_value_to_enum_fails():
     with pytest.raises(ValueError) as excinfo:
-        value_to_enum(EnumObj, "1")
+        util.value_to_enum(EnumObj, "1")
 
     assert str(excinfo.value) == "'1' is not a valid EnumObj"
 
@@ -59,15 +59,16 @@ def test_value_to_enum_fails():
     ],
 )
 def test_td_convertion_to_wdhms(value, expected):
-    assert seconds_to_wdhms(value) == expected
+    assert util.seconds_to_wdhms(value) == expected
 
 
 def test_td_convertion_fails():
     value = 18000
     with pytest.raises(ValueError) as excinfo:
-        seconds_to_wdhms(value)
+        util.seconds_to_wdhms(value)
 
     assert str(excinfo.value) == (
         f"Incorrect type of variable is passed. Provided type: {type(value)} "
         "and should be of timedelta type."
     )
+
