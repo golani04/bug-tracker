@@ -45,3 +45,8 @@ def seconds_to_wdhms(td: timedelta) -> Dict[str, int]:
     hours, minutes = divmod(minutes, 60)
 
     return dict(weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+
+def wdhms_to_seconds(wdmhs: Union[Dict[str, int], int]) -> timedelta:
+    """[dict]: {'weeks': 0, 'days': 0, 'hours': 0, 'minutes':0, 'seconds': 0}"""
+    return wdmhs if isinstance(wdmhs, int) else timedelta(**wdmhs).total_seconds()

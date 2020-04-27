@@ -72,3 +72,28 @@ def test_td_convertion_fails():
         "and should be of timedelta type."
     )
 
+
+@pytest.mark.parametrize(
+    "wdhms",
+    [
+        {"weeks": 2},
+        {"weeks": 0, "days": 5, "minutes": 17},
+        {"weeks": 0, "days": 35, "seconds": 10},
+        100,
+        0,
+        1001,
+    ],
+)
+def test_wdhms_to_seconds(wdhms):
+    times = {
+        "week": 7 * 24 * 60 * 60,
+        "day": 24 * 60 * 60,
+        "hour": 60 * 60,
+        "minute": 60,
+        "second": 1,
+    }
+    expected = (
+        sum((times[k[:-1]] * v for k, v in wdhms.items())) if isinstance(wdhms, dict) else wdhms
+    )
+
+    assert util.wdhms_to_seconds(wdhms) == expected
