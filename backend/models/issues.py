@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from enum import Enum
 from functools import lru_cache
@@ -104,8 +104,9 @@ class Issue:
     def delete(self):
         return self.get_all().pop(self.id)
 
-    def modify(self):
-        pass
+    def modify(self, data: Dict):
+        filterd_data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
+        return replace(self, **filterd_data)
 
     def save(self, state: str):
         issues = self.get_all()
