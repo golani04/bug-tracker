@@ -1,6 +1,8 @@
 from dataclasses import asdict, fields, is_dataclass
+from datetime import date, timedelta
+from freezegun import freeze_time
 
-from backend.models.issues import Issue, Severity
+from backend.models.issues import Issue, Status, Severity
 
 _ISSUE_ID = "567890abcdefghijklmnopqrstuvwxyz" * 2
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
@@ -46,3 +48,128 @@ def test_find_by_id_that_not_exist(app):
     issue = Issue.find_by_id(_ISSUE_ID)
 
     assert issue is None
+
+
+def test_issue_delete_without_save_missing_in_db(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # when #
+    issue.delete()
+    # then
+    assert Issue.get_all().get(issue.id) is None
+    # when, check that DB did not changed
+    Issue.get_all.cache_clear()
+    # then
+    assert Issue.get_all().get(issue.id) == issue
+
+
+@freeze_time("2020-01-01")
+def test_issue_create(app):
+    issue = Issue.create(
+        {
+            "title": "Test createIssue",
+            "description": "Created test issue.",
+            "assignee": _MAINTAINER_ID,
+            "reporter": _MAINTAINER_ID,
+            "project": _PROJECT_ID,
+            "links": "https://www.google.com/search?q=testings",
+            "severity": 1,
+            "status": 4,
+            "time_spent": {"days": 1, "hours": 11},
+        }
+    )
+
+    assert issue is not None
+    assert issue.assignee == _MAINTAINER_ID
+    assert issue.created == date(2020, 1, 1)
+    assert issue.time_spent == timedelta(**{"days": 1, "hours": 11}).total_seconds()
+
+    _ID = issue.id
+    assert Issue.find_by_id(_ID) is None
+
+    issue.save("create")
+    assert Issue.find_by_id(_ID) is not None
+
+
+def test_issue_delete(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    issue.delete()
+    # when, call save method to register it to DB
+    issue.save("delete")
+    # then
+    assert Issue.get_all().get(issue.id) is None
+
+
+def test_issue_delete_none(app):
+    issue = Issue.find_by_id(_ISSUE_ID)
+    assert issue is None
+
+
+def test_issue_modify(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    data = {
+        "title": "Issue 111",
+        "description": "Integer ac leo. Pellentesque ultrices mattis odio.",
+        "assignee": _MAINTAINER_ID,
+        "links": "https://www.google.com/search?q=testings",
+        "severity": 1,
+        "status": 4,
+    }
+    issue = issue.modify(data)
+    # then
+    assert issue.id == _EXISTING_ISSUE_ID
+    assert issue.assignee == _MAINTAINER_ID
+    assert issue.title == data["title"]
+    assert issue.links == data["links"]
+    assert issue.severity == Severity.low
+    assert issue.status == Status.close
+
+
+def test_issue_modify_unchangeable_keys(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    data = {
+        "id": _ISSUE_ID,
+        "reporter": _MAINTAINER_ID,
+        "project": _PROJECT_ID,
+        "created": "2020-04-29",
+    }
+    issue = issue.modify(data)
+    # then
+    assert issue.id != _ISSUE_ID
+    assert issue.reporter != _MAINTAINER_ID
+    assert issue.project != _PROJECT_ID
+    assert issue.created != data["created"]
+
+
+def test_issue_modify_saved(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+
+    # when
+    issue = issue.modify({"title": "Issue 111"})
+    # then
+    assert issue.title == "Issue 111"
+
+    # when, not saved
+    Issue.get_all.cache_clear()
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # then
+    assert issue.title != "Issue 111"
+
+    # when, saved
+    issue = issue.modify({"title": "Issue 111"})
+    issue.save("modify")
+    Issue.get_all.cache_clear()
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # then
+    assert issue.title == "Issue 111"

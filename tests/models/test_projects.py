@@ -33,7 +33,7 @@ def test_post_init_escape_html_name():
 
 def test_get_projects_are_cached(app):
     # GIVEN
-    get_projects = Project.get_all_projects
+    get_projects = Project.get_all
     cache_info = get_projects.cache_info
     # clear cache before tests
     get_projects.cache_clear()
@@ -52,7 +52,7 @@ def test_get_projects_are_cached(app):
 
 def test_that_cached_cleared(app):
     # GIVEN
-    get_projects = Project.get_all_projects
+    get_projects = Project.get_all
     cache_info = get_projects.cache_info
     # WHEN
     get_projects()
@@ -85,13 +85,13 @@ def test_maintainer_id_invalid():
 
 def test_project_save(app):
     # GIVEN
-    length = len(Project.get_all_projects())
+    length = len(Project.get_all())
     assert length > 0
     # WHEN
     project = Project(_PROJECT_ID, "tes<t", _MAINTAINER_ID, "Testing a project")
     # THEN
     assert project.save("create") is True
-    assert len(Project.get_all_projects()) == length + 1
+    assert len(Project.get_all()) == length + 1
 
 
 def test_find_project(app):
@@ -107,7 +107,7 @@ def test_find_project_failed(app):
 def test_delete_project(app):
     project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
     assert project.delete() is not None
-    assert any(project_id == project.id for project_id in Project.get_all_projects()) is False
+    assert any(project_id == project.id for project_id in Project.get_all()) is False
 
 
 @freeze_time("2020-01-01 12:00:00.1234")

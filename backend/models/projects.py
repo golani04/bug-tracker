@@ -52,12 +52,12 @@ class Project:
 
     @classmethod
     @lru_cache(1)
-    def get_all_projects(cls) -> List["Project"]:
+    def get_all(cls) -> List["Project"]:
         return {project["id"]: cls(**project) for project in db.get_projects()}
 
     @classmethod
     def find_by_id(cls, id_: str) -> Optional["Project"]:
-        return cls.get_all_projects().get(id_)
+        return cls.get_all().get(id_)
 
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
@@ -78,19 +78,20 @@ class Project:
         return self._convert_to_custom_dict(self)
 
     def delete(self) -> "Project":
-        return self.get_all_projects().pop(self.id)
+        return self.get_all().pop(self.id)
 
     def modify(self, data: Dict) -> "Project":
         data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
         data["updated"] = datetime.utcnow()
+        # using `replace` will also invoke post init where the validation runs
         return replace(self, **data)
 
     def save(self, state: str = None) -> bool:
-        projects = self.get_all_projects()
+        projects = self.get_all()
         if state in {"create", "modify"}:
             projects[self.id] = self
 
         # clear cache
-        self.get_all_projects.cache_clear()
+        self.get_all.cache_clear()
 
         return db.save_projects([project.to_dict() for project in projects.values()])

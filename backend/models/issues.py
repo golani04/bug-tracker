@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from enum import Enum
 from functools import lru_cache
@@ -46,7 +46,7 @@ class Issue:
         validate.is_enum_has_prop(Severity, self.severity)
         validate.is_enum_has_prop(Status, self.status)
         validate.is_enum_has_prop(Label, self.label)
-        validate.is_numeric(self.time_spent)
+        validate.is_time_dict(self.time_spent)
         validate.is_date(self.created)
         self.due and validate.is_date(self.due)  # allowed to be None
         # transform props to required formats
@@ -58,7 +58,7 @@ class Issue:
         self.status = util.value_to_enum(Status, self.status)
         self.label = util.value_to_enum(Label, self.label)
         # timedelta seconds to timedelta
-        self.time_spent = timedelta(seconds=(self.time_spent or 0))
+        self.time_spent = util.wdhms_to_seconds(self.time_spent)
         # convert str to dates
         self.created = util.set_date(self.created)
         self.due = util.set_date(self.due, allowed_none=True)
@@ -101,10 +101,11 @@ class Issue:
         return cls.get_all().get(id_)
 
     def delete(self):
-        pass
+        return self.get_all().pop(self.id)
 
-    def modify(self):
-        pass
+    def modify(self, data: Dict):
+        filterd_data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
+        return replace(self, **filterd_data)
 
     def save(self, state: str):
         issues = self.get_all()
