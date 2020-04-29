@@ -1,6 +1,6 @@
 from dataclasses import asdict, fields, is_dataclass
 
-from backend.models.issues import Issue, Severity
+from backend.models.issues import Issue, Status, Severity
 
 _ISSUE_ID = "567890abcdefghijklmnopqrstuvwxyz" * 2
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
@@ -76,3 +76,70 @@ def test_issue_delete(app):
 def test_issue_delete_none(app):
     issue = Issue.find_by_id(_ISSUE_ID)
     assert issue is None
+
+
+def test_issue_modify(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    data = {
+        "title": "Issue 111",
+        "description": "Integer ac leo. Pellentesque ultrices mattis odio.",
+        "assignee": _MAINTAINER_ID,
+        "links": "https://www.google.com/search?q=testings",
+        "severity": 1,
+        "status": 4,
+    }
+    issue = issue.modify(data)
+    # then
+    assert issue.id == _EXISTING_ISSUE_ID
+    assert issue.assignee == _MAINTAINER_ID
+    assert issue.title == data["title"]
+    assert issue.links == data["links"]
+    assert issue.severity == Severity.low
+    assert issue.status == Status.close
+
+
+def test_issue_modify_unchangeable_keys(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+    # when
+    data = {
+        "id": _ISSUE_ID,
+        "reporter": _MAINTAINER_ID,
+        "project": _PROJECT_ID,
+        "created": "2020-04-29",
+    }
+    issue = issue.modify(data)
+    # then
+    assert issue.id != _ISSUE_ID
+    assert issue.reporter != _MAINTAINER_ID
+    assert issue.project != _PROJECT_ID
+    assert issue.created != data["created"]
+
+
+def test_issue_modify_saved(app):
+    # given
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    assert issue is not None
+
+    # when
+    issue = issue.modify({"title": "Issue 111"})
+    # then
+    assert issue.title == "Issue 111"
+
+    # when, not saved
+    Issue.get_all.cache_clear()
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # then
+    assert issue.title != "Issue 111"
+
+    # when, saved
+    issue = issue.modify({"title": "Issue 111"})
+    issue.save("modify")
+    Issue.get_all.cache_clear()
+    issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
+    # then
+    assert issue.title == "Issue 111"
