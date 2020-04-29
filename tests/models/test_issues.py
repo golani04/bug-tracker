@@ -1,4 +1,6 @@
 from dataclasses import asdict, fields, is_dataclass
+from datetime import date, timedelta
+from freezegun import freeze_time
 
 from backend.models.issues import Issue, Status, Severity
 
@@ -59,6 +61,34 @@ def test_issue_delete_without_save_missing_in_db(app):
     Issue.get_all.cache_clear()
     # then
     assert Issue.get_all().get(issue.id) == issue
+
+
+@freeze_time("2020-01-01")
+def test_issue_create(app):
+    issue = Issue.create(
+        {
+            "title": "Test createIssue",
+            "description": "Created test issue.",
+            "assignee": _MAINTAINER_ID,
+            "reporter": _MAINTAINER_ID,
+            "project": _PROJECT_ID,
+            "links": "https://www.google.com/search?q=testings",
+            "severity": 1,
+            "status": 4,
+            "time_spent": {"days": 1, "hours": 11},
+        }
+    )
+
+    assert issue is not None
+    assert issue.assignee == _MAINTAINER_ID
+    assert issue.created == date(2020, 1, 1)
+    assert issue.time_spent == timedelta(**{"days": 1, "hours": 11}).total_seconds()
+
+    _ID = issue.id
+    assert Issue.find_by_id(_ID) is None
+
+    issue.save("create")
+    assert Issue.find_by_id(_ID) is not None
 
 
 def test_issue_delete(app):
