@@ -3,7 +3,7 @@ import pytest
 from collections import namedtuple
 from typing import NamedTuple
 
-from backend import create_app
+from backend import create_app, models
 from tests.data import projects, issues
 
 
@@ -30,3 +30,6 @@ def app(tmp_config: NamedTuple):
 
     with app.test_client() as client:
         yield client
+
+    models.projects.Project.get_all.cache_clear()
+    models.issues.Issue.get_all.cache_clear()
