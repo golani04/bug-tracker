@@ -93,3 +93,18 @@ def test_numeric(num):
 def test_numeric_fail(num):
     with pytest.raises(validate.ValidationError):
         validate.is_numeric(num)
+
+
+@pytest.mark.parametrize(
+    "time_obj", [{"weeks": 1, "hours": 3, "minutes": 2}, {"seconds": 10000}, 100, 32.2]
+)
+def test_is_time_dict(time_obj):
+    assert validate.is_time_dict(time_obj)
+
+
+@pytest.mark.parametrize(
+    "time_obj", [{"years": 1, "hours": 3, "minutes": 2}, {"months": 10}, "100", set([1, 2, 3])],
+)
+def test_is_time_dict_raises(time_obj):
+    with pytest.raises(validate.ValidationError):
+        assert validate.is_time_dict(time_obj)

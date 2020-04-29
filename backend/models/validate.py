@@ -1,9 +1,9 @@
 import re
 import secrets
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import List, Union
+from typing import Dict, List, Union
 
 
 _ALPHANUMERIC = re.compile(r"[^A-Za-z0-9]+")
@@ -66,3 +66,27 @@ def is_date(date_: Union[str, date]) -> bool:
 
 def is_datetime(datetime_: Union[str, datetime]) -> bool:
     return _is_date_types(datetime_, datetime)
+
+
+def is_time_dict(time_obj: Union[Dict[str, int], int, float]) -> bool:
+    """
+    Arguments:
+        time_obj {Union[int, float]} -- numeric property, is taken from the database
+        time_obj {Dict[str, int]} -- dict property, is send from the client
+
+    Raises:
+        ValidationError: If type differs from numeric or from timedelta
+
+    Returns:
+        bool
+    """
+    if isinstance(time_obj, dict):
+        try:
+            timedelta(**time_obj)
+            return True
+        except TypeError:
+            raise ValidationError(f"Provided object is not timedelta object: {type(time_obj)}")
+
+    # is_numeric will raise a ValidationError
+    if is_numeric(time_obj):
+        return True
