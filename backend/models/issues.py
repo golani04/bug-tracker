@@ -46,8 +46,7 @@ class Issue:
         validate.is_enum_has_prop(Severity, self.severity)
         validate.is_enum_has_prop(Status, self.status)
         validate.is_enum_has_prop(Label, self.label)
-        # TODO: convert dict to int
-        # validate.is_numeric(self.time_spent)
+        validate.is_time_dict(self.time_spent)
         validate.is_date(self.created)
         self.due and validate.is_date(self.due)  # allowed to be None
         # transform props to required formats
