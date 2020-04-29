@@ -15,7 +15,7 @@ from backend.models.projects import Project
 
 @bp.route("/projects", methods=["GET"])
 def get_projects():
-    return jsonify(list(Project.get_all_projects().values())), 200
+    return jsonify(list(Project.get_all().values())), 200
 
 
 @bp.route("/projects", methods=["POST"])

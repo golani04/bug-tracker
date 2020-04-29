@@ -59,7 +59,7 @@ def test_projects_get(app):
 
 @pytest.mark.api
 def test_create_project(app):
-    length = len(Project.get_all_projects())
+    length = len(Project.get_all())
     response = app.post(
         "/api/v0/projects",
         json={
@@ -71,7 +71,7 @@ def test_create_project(app):
 
     assert response.status_code == 201
 
-    projects = Project.get_all_projects()
+    projects = Project.get_all()
     assert length + 1 == len(projects)
 
     project_api = response.get_json()
