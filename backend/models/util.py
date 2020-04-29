@@ -1,7 +1,7 @@
 import secrets
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 
 def create_id():
@@ -12,19 +12,29 @@ def value_to_enum(obj: Enum, value: Union[int, Enum]) -> Enum:
     return value if isinstance(value, obj) else obj(value)
 
 
-# TODO: eleminate code repeat for assigning date/dateimes values
-def set_date(date_: Optional[Union[str, date]], allowed_none: bool = False):
-    if allowed_none and date_ is None:
-        return date_
+def allow_none(f):
+    def wrapper(value: Any, allowed_none: bool = False) -> Optional[Any]:
+        if allowed_none and value is None:
+            return None
+        return f(value)
 
-    return date_ if isinstance(date_, date) else date.fromisoformat(date_)
+    return wrapper
 
 
-def set_datetime(datetime_: Optional[Union[str, datetime]], allowed_none: bool = False):
-    if allowed_none and datetime_ is None:
-        return datetime_
+def _set_datetimes(
+    dates: Union[str, date, datetime], types: Union[date, datetime]
+) -> Union[date, datetime]:
+    return dates if isinstance(dates, types) else types.fromisoformat(dates)
 
-    return datetime_ if isinstance(datetime_, datetime) else datetime.fromisoformat(datetime_)
+
+@allow_none
+def set_date(date_: Union[date, datetime]):
+    return _set_datetimes(date_, date)
+
+
+@allow_none
+def set_datetime(datetime_: Union[str, datetime]):
+    return _set_datetimes(datetime_, datetime)
 
 
 def seconds_to_wdhms(td: timedelta) -> Dict[str, int]:
@@ -47,6 +57,10 @@ def seconds_to_wdhms(td: timedelta) -> Dict[str, int]:
     return dict(weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
-def wdhms_to_seconds(wdmhs: Union[Dict[str, int], int]) -> timedelta:
-    """[dict]: {'weeks': 0, 'days': 0, 'hours': 0, 'minutes':0, 'seconds': 0}"""
-    return wdmhs if isinstance(wdmhs, int) else timedelta(**wdmhs).total_seconds()
+def wdhms_to_seconds(wdmhs: Union[Dict[str, int], int]) -> int:
+    """Convert timedelda dict to seconds
+
+        Arguments:
+            [dict]: {'weeks': 0, 'days': 0, 'hours': 0, 'minutes':0, 'seconds': 0}
+    """
+    return wdmhs if isinstance(wdmhs, (int, float)) else timedelta(**wdmhs).total_seconds()
