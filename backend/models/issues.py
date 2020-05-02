@@ -35,6 +35,7 @@ class Issue:
     # TODO: images: List[str] = field(default_factory=list)
     # define class variable
     unchangeable_props: ClassVar[Set] = {"id", "created", "project", "reporter"}
+    required_props: ClassVar[Set] = {"assignee", "title", "project", "reporter"}
 
     def __post_init__(self):
         # validate props
