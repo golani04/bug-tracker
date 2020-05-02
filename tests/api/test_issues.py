@@ -107,28 +107,9 @@ def test_get_issue(app, mock_model_methods):
 
 
 @pytest.mark.api
-def test_get_issue_failed(app, monkeypatch):
-    # mock that issue is not found
-    monkeypatch.setattr(Issue, "find_by_id", lambda _: None)
-    response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
-
-    assert response.status_code == 404
-    assert response.get_json()["message"] == "Required issue is missing"
-
-
-@pytest.mark.api
 def test_issue_delete(app, mock_model_methods):
     response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
     assert response.status_code == 204
-
-
-@pytest.mark.api
-def test_issue_delete_404(app, monkeypatch):
-    monkeypatch.setattr(Issue, "find_by_id", lambda *_: None)
-    response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
-
-    assert response.status_code == 404
-    assert response.get_json()["message"] == "Required issue is missing"
 
 
 @pytest.mark.api
@@ -141,11 +122,22 @@ def test_issue_modify(app, mock_model_methods):
 
 
 @pytest.mark.api
-def test_issue_modify_404(app, monkeypatch):
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        (
+            "patch",
+            (f"/api/v0/issues/{_ISSUE_ID}",),
+            {"json": {"title": "Test an issue modification"}},
+        ),
+        ("get", (f"/api/v0/issues/{_ISSUE_ID}",), {}),
+        ("delete", (f"/api/v0/issues/{_ISSUE_ID}",), {}),
+    ],
+)
+def test_issue_modify_404(action, args, kwargs, app, monkeypatch):
     monkeypatch.setattr(Issue, "find_by_id", lambda *_: None)
-    response = app.patch(
-        f"/api/v0/issues/{_ISSUE_ID}", json={"title": "Test an issue modification"}
-    )
+    actions = {"patch": app.patch, "delete": app.delete, "get": app.get, "post": app.post}
+    response = actions[action](*args, **kwargs)
 
     assert response.status_code == 404
     assert response.get_json()["message"] == "Required issue is missing"
