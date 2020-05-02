@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Callable, Dict, Set, Union
 from flask import request
 
-from backend.models.projects import Project
+from backend.models import issues, projects
 from .errors import bad_request, not_found
 
 
@@ -42,10 +42,10 @@ def check_required_keys(required_keys: Set) -> Callable:
     return wrapper
 
 
-def check_item_exists(model: Union[Project], error_msg: str) -> Callable:
+def check_item_exists(model: Union[projects.Project, issues.Issue], error_msg: str) -> Callable:
     def wrapper(route_func: Callable) -> Callable:
         @wraps(route_func)
-        def inner_wrapper(item_id: str, *args, **kwargs) -> Union[Project]:
+        def inner_wrapper(item_id: str, *args, **kwargs) -> Union[projects.Project, issues.Issue]:
             item = model.find_by_id(item_id)
             if item is None:
                 return not_found(error_msg)
