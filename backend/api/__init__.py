@@ -16,3 +16,4 @@ def _after_req(response):
 
 
 from .projects import projects  # noqa
+from .issues import issues  # noqa
