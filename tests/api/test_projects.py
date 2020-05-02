@@ -6,46 +6,24 @@ _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
 
-@pytest.fixture
-def find_by_id(monkeypatch):
-    monkeypatch.setattr(
-        Project,
-        "find_by_id",
-        lambda _: Project(
-            _PROJECT_ID,
-            "test project",
-            _MAINTAINER_ID,
-            "Monkeypatch a project to test api responses",
-        ),
+def get_demo_project(*args, **kwargs):
+    return Project(
+        _PROJECT_ID,
+        "test project",
+        _MAINTAINER_ID,
+        "Monkeypatch a project to test an API responses",
     )
 
 
 @pytest.fixture
-def del_project(find_by_id, monkeypatch):
-    monkeypatch.setattr(
-        Project,
-        "delete",
-        lambda _: Project(
-            _PROJECT_ID,
-            "test project",
-            _MAINTAINER_ID,
-            "Monkeypatch a project to test api responses",
-        ),
-    )
+def mock_model_methods(monkeypatch):
+    for prop in ["find_by_id", "modify", "delete"]:
+        monkeypatch.setattr(Project, prop, get_demo_project)
 
 
 @pytest.fixture
-def mod_project(find_by_id, monkeypatch):
-    monkeypatch.setattr(
-        Project,
-        "modify",
-        lambda *_: Project(
-            _PROJECT_ID,
-            "test project",
-            _MAINTAINER_ID,
-            "Monkeypatch a project to test api responses",
-        ),
-    )
+def mock_model_save(monkeypatch):
+    monkeypatch.setattr(Project, "save", lambda *_: False)
 
 
 @pytest.mark.api
@@ -114,9 +92,8 @@ def test_create_project(app):
         ),
     ],
 )
-def test_create_project_failed(data, expected, app, monkeypatch):
+def test_create_project_failed(data, expected, app, mock_model_save):
     # 500: an error produce by the database
-    monkeypatch.setattr(Project, "save", lambda *_: False)
     response = app.post("/api/v0/projects", **data)
     assert response.status_code in {400, 500}
 
@@ -125,7 +102,7 @@ def test_create_project_failed(data, expected, app, monkeypatch):
 
 
 @pytest.mark.api
-def test_get_project(app, find_by_id):
+def test_get_project(app, mock_model_methods):
     response = app.get(f"/api/v0/projects/{_PROJECT_ID}")
 
     assert response.status_code == 200
@@ -147,7 +124,7 @@ def test_get_project_failed(app, monkeypatch):
 
 
 @pytest.mark.api
-def test_project_delete(app, del_project):
+def test_project_delete(app, mock_model_methods):
     response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
     assert response.status_code == 204
 
@@ -162,9 +139,8 @@ def test_project_delete_404(app, monkeypatch):
 
 
 @pytest.mark.api
-def test_project_delete_500(app, del_project, monkeypatch):
+def test_project_delete_500(app, mock_model_methods, mock_model_save):
     # an error produce by the database
-    monkeypatch.setattr(Project, "save", lambda *_: False)
     response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
 
     assert response.status_code == 500
@@ -172,7 +148,7 @@ def test_project_delete_500(app, del_project, monkeypatch):
 
 
 @pytest.mark.api
-def test_modify_project(app, mod_project):
+def test_modify_project(app, mock_model_methods):
     response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
 
     assert response.status_code == 200
@@ -188,9 +164,8 @@ def test_project_modify_404(app, monkeypatch):
 
 
 @pytest.mark.api
-def test_project_modify_500(app, del_project, monkeypatch):
+def test_project_modify_500(app, mock_model_methods, mock_model_save):
     # an error produce by the database
-    monkeypatch.setattr(Project, "save", lambda *_: False)
     response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
 
     assert response.status_code == 500

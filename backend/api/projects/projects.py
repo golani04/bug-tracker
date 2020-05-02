@@ -29,13 +29,13 @@ def create_project(data: Dict):
     return jsonify(project.to_dict()), 201
 
 
-@bp.route("/projects/<string:project_id>", methods=["GET"])
+@bp.route("/projects/<string:item_id>", methods=["GET"])
 @check_item_exists(Project, "Required project is missing")
 def get_project(project: Project):
     return jsonify(project.to_dict()), 200
 
 
-@bp.route("/projects/<string:project_id>", methods=["PATCH"])
+@bp.route("/projects/<string:item_id>", methods=["PATCH"])
 @check_requested_data
 @filter_unchangeable_keys(Project.unchangeable_props)
 @check_item_exists(Project, "Required project is missing")
@@ -47,7 +47,7 @@ def update_project(project: Project, data: Dict):
     return jsonify(project.to_dict()), 200
 
 
-@bp.route("/projects/<string:project_id>", methods=["DELETE"])
+@bp.route("/projects/<string:item_id>", methods=["DELETE"])
 @check_item_exists(Project, "Required project is missing")
 def delete_project(project: Project):
     project.delete()
