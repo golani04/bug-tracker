@@ -1,5 +1,4 @@
 import pytest
-
 from backend.models.issues import Issue
 
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
@@ -93,26 +92,26 @@ def test_create_issue_failed(data, expected, app, monkeypatch):
     assert error["message"] == expected
 
 
-@pytest.fixture
-def find_by_id(monkeypatch):
-    monkeypatch.setattr(
-        Issue,
-        "find_by_id",
-        lambda _: Issue(
-            **{
-                "id": _ISSUE_ID,
-                "title": "Create Issue from API",
-                "reporter": _MAINTAINER_ID,
-                "assignee": _MAINTAINER_ID,
-                "project": _PROJECT_ID,
-                "description": "Monkeypatch an issue to test an API response",
-            }
-        ),
+def get_demo_issue(*args, **kwargs):
+    return Issue(
+        **{
+            "id": _ISSUE_ID,
+            "title": "Create Issue from API",
+            "reporter": _MAINTAINER_ID,
+            "assignee": _MAINTAINER_ID,
+            "project": _PROJECT_ID,
+            "description": "Monkeypatch an issue to test an API response",
+        }
     )
 
 
+@pytest.fixture
+def mock_model_methods(monkeypatch):
+    for prop in ["find_by_id", "delete"]:
+        monkeypatch.setattr(Issue, prop, get_demo_issue)
+
 @pytest.mark.api
-def test_get_issue(app, find_by_id):
+def test_get_issue(app, mock_model_methods):
     response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
 
     assert response.status_code == 200
@@ -123,9 +122,8 @@ def test_get_issue(app, find_by_id):
 
 @pytest.mark.api
 def test_get_issue_failed(app, monkeypatch):
-    monkeypatch.setattr(
-        Issue, "find_by_id", lambda _: None,
-    )
+    # mock that issue is not found
+    monkeypatch.setattr(Issue, "find_by_id", lambda _: None)
     response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
 
     assert response.status_code == 404
