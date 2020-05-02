@@ -7,6 +7,7 @@ from backend.api.util import (
     check_item_exists,
     check_requested_data,
     check_required_keys,
+    filter_unchangeable_keys,
 )
 
 from backend.models.issues import Issue
@@ -31,6 +32,18 @@ def create_issue(data: Dict):
 @bp.route("/issues/<string:item_id>", methods=["GET"])
 @check_item_exists(Issue, "Required issue is missing")
 def get_issue(issue: Issue):
+    return jsonify(issue.to_dict()), 200
+
+
+@bp.route("/issues/<string:item_id>", methods=["PATCH"])
+@check_requested_data
+@filter_unchangeable_keys(Issue.unchangeable_props)
+@check_item_exists(Issue, "Required issue is missing")
+def update_issue(issue: Issue, data: Dict):
+    issue = Issue.modify(data)
+    if issue.save("modify") is False:
+        return error_response(500)
+
     return jsonify(issue.to_dict()), 200
 
 
