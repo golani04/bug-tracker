@@ -68,28 +68,13 @@ def test_create_issue(app):
             },
             "Missing required key: title.",
         ),
-        (
-            # if save returns false
-            {
-                "json": {
-                    "reporter": _MAINTAINER_ID,
-                    "assignee": _MAINTAINER_ID,
-                    "project": _PROJECT_ID,
-                    "title": "Test save method",
-                }
-            },
-            "Internal Server Error",
-        ),
     ],
 )
-def test_create_issue_failed(data, expected, app, monkeypatch):
-    # 500: an error produce by the database
-    monkeypatch.setattr(Issue, "save", lambda *_: False)
+def test_create_issue_failed(data, expected, app):
     response = app.post("/api/v0/issues", **data)
-    assert response.status_code in {400, 500}
 
-    error = response.get_json()
-    assert error["message"] == expected
+    assert response.status_code == 400
+    assert response.get_json()["message"] == expected
 
 
 def get_demo_issue(*args, **kwargs):
@@ -109,11 +94,6 @@ def get_demo_issue(*args, **kwargs):
 def mock_model_methods(monkeypatch):
     for prop in ["find_by_id", "delete", "modify"]:
         monkeypatch.setattr(Issue, prop, get_demo_issue)
-
-
-@pytest.fixture
-def mock_model_save(monkeypatch):
-    monkeypatch.setattr(Issue, "save", lambda *_: False)
 
 
 @pytest.mark.api
@@ -152,15 +132,6 @@ def test_issue_delete_404(app, monkeypatch):
 
 
 @pytest.mark.api
-def test_issue_delete_500(app, mock_model_methods, mock_model_save):
-    # an error produce by the database
-    response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
-
-    assert response.status_code == 500
-    assert response.get_json()["message"] == "Internal Server Error"
-
-
-@pytest.mark.api
 def test_issue_modify(app, mock_model_methods):
     response = app.patch(
         f"/api/v0/issues/{_ISSUE_ID}", json={"title": "Test an issue modification"}
@@ -181,11 +152,34 @@ def test_issue_modify_404(app, monkeypatch):
 
 
 @pytest.mark.api
-def test_issue_modify_500(app, mock_model_methods, mock_model_save):
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        (
+            "post",
+            (f"/api/v0/issues",),
+            {
+                "json": {
+                    "reporter": _MAINTAINER_ID,
+                    "assignee": _MAINTAINER_ID,
+                    "project": _PROJECT_ID,
+                    "title": "Test save method",
+                }
+            },
+        ),
+        (
+            "patch",
+            (f"/api/v0/issues/{_ISSUE_ID}",),
+            {"json": {"title": "Test an issue modification"}},
+        ),
+        ("delete", (f"/api/v0/issues/{_ISSUE_ID}",), {}),
+    ],
+)
+def test_issue_500(action, args, kwargs, app, mock_model_methods, monkeypatch):
     # an error produce by the database
-    response = app.patch(
-        f"/api/v0/issues/{_ISSUE_ID}", json={"title": "Test an issue modification"}
-    )
+    monkeypatch.setattr(Issue, "save", lambda *_: False)
+    actions = {"patch": app.patch, "delete": app.delete, "post": app.post}
+    response = actions[action](*args, **kwargs)
 
     assert response.status_code == 500
     assert response.get_json()["message"] == "Internal Server Error"
