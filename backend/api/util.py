@@ -45,8 +45,8 @@ def check_required_keys(required_keys: Set) -> Callable:
 def check_item_exists(model: Union[Project], error_msg: str) -> Callable:
     def wrapper(route_func: Callable) -> Callable:
         @wraps(route_func)
-        def inner_wrapper(project_id: str, *args, **kwargs) -> Union[Project]:
-            item = model.find_by_id(project_id)
+        def inner_wrapper(item_id: str, *args, **kwargs) -> Union[Project]:
+            item = model.find_by_id(item_id)
             if item is None:
                 return not_found(error_msg)
 
@@ -60,11 +60,11 @@ def check_item_exists(model: Union[Project], error_msg: str) -> Callable:
 def filter_unchangeable_keys(unallowed_keys: Set = None) -> Callable:
     def wrapper(route_func: Callable) -> Callable:
         @wraps(route_func)
-        def inner_wrapper(data: Dict, project_id: str, *args, **kwargs) -> Dict:
+        def inner_wrapper(data: Dict, item_id: str, *args, **kwargs) -> Dict:
             if unallowed_keys is not None:
                 data = {k: v for k, v in data.items() if k not in unallowed_keys}
 
-            return route_func(project_id, data, *args, **kwargs)
+            return route_func(item_id, data, *args, **kwargs)
 
         return inner_wrapper
 
