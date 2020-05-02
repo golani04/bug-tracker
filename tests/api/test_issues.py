@@ -110,6 +110,12 @@ def mock_model_methods(monkeypatch):
     for prop in ["find_by_id", "delete"]:
         monkeypatch.setattr(Issue, prop, get_demo_issue)
 
+
+@pytest.fixture
+def mock_model_save(monkeypatch):
+    monkeypatch.setattr(Issue, "save", lambda *_: False)
+
+
 @pytest.mark.api
 def test_get_issue(app, mock_model_methods):
     response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
@@ -128,3 +134,27 @@ def test_get_issue_failed(app, monkeypatch):
 
     assert response.status_code == 404
     assert response.get_json()["message"] == "Required issue is missing"
+
+
+@pytest.mark.api
+def test_issue_delete(app, mock_model_methods):
+    response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
+    assert response.status_code == 204
+
+
+@pytest.mark.api
+def test_issue_delete_404(app, monkeypatch):
+    monkeypatch.setattr(Issue, "find_by_id", lambda *_: None)
+    response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
+
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required issue is missing"
+
+
+@pytest.mark.api
+def test_issue_delete_500(app, mock_model_methods, mock_model_save):
+    # an error produce by the database
+    response = app.delete(f"/api/v0/issues/{_ISSUE_ID}")
+
+    assert response.status_code == 500
+    assert response.get_json()["message"] == "Internal Server Error"

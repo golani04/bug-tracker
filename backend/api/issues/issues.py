@@ -32,3 +32,13 @@ def create_issue(data: Dict):
 @check_item_exists(Issue, "Required issue is missing")
 def get_issue(issue: Issue):
     return jsonify(issue.to_dict()), 200
+
+
+@bp.route("/issues/<string:item_id>", methods=["DELETE"])
+@check_item_exists(Issue, "Required issue is missing")
+def delete_issue(issue: Issue):
+    issue.delete()
+    if issue.save("delete") is False:
+        return error_response(500)
+
+    return jsonify(), 204
