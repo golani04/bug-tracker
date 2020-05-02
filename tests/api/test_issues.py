@@ -91,3 +91,42 @@ def test_create_issue_failed(data, expected, app, monkeypatch):
 
     error = response.get_json()
     assert error["message"] == expected
+
+
+@pytest.fixture
+def find_by_id(monkeypatch):
+    monkeypatch.setattr(
+        Issue,
+        "find_by_id",
+        lambda _: Issue(
+            **{
+                "id": _ISSUE_ID,
+                "title": "Create Issue from API",
+                "reporter": _MAINTAINER_ID,
+                "assignee": _MAINTAINER_ID,
+                "project": _PROJECT_ID,
+                "description": "Monkeypatch an issue to test an API response",
+            }
+        ),
+    )
+
+
+@pytest.mark.api
+def test_get_issue(app, find_by_id):
+    response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
+
+    assert response.status_code == 200
+    issue = response.get_json()
+    assert issue is not None
+    assert issue["id"] == _ISSUE_ID
+
+
+@pytest.mark.api
+def test_get_issue_failed(app, monkeypatch):
+    monkeypatch.setattr(
+        Issue, "find_by_id", lambda _: None,
+    )
+    response = app.get(f"/api/v0/issues/{_ISSUE_ID}")
+
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required issue is missing"
