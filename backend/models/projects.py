@@ -6,6 +6,7 @@ from typing import ClassVar, Dict, List, Set, Optional
 from flask import escape
 from backend import database as db
 from backend.models import validate, util
+from backend.models.issues import Issue
 
 
 @dataclass
@@ -26,7 +27,7 @@ class Project:
     # FK, that collect all items that is connected to project
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
-    issues: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
+    issues: List[str] = field(default_factory=list, repr=False, compare=False)
     # define class variable
     unchangeable_props: ClassVar[Set] = {"id", "created", "updated"}
 
@@ -58,6 +59,23 @@ class Project:
     @classmethod
     def find_by_id(cls, id_: str) -> Optional["Project"]:
         return cls.get_all().get(id_)
+
+    def get_issues(self) -> List[Issue]:
+        project_issues = []
+
+        if self.issues:
+            issues = Issue.get_all()
+            project_issues = [issues[id_] for id_ in self.issues if id_ in issues]
+        else:
+            project_issues = Issue.search({"project": self.id})
+
+        # this if agains solid pronsiples, single responsibility principle
+        # TODO: remove when db will be changed from files to SQL
+        if not self.issues or len(self.issues) != len(project_issues):
+            self.issues = [issue.id for issue in project_issues]
+            self.save("modify")
+
+        return project_issues
 
     @staticmethod
     def _convert_to_custom_dict(project: "Project") -> Dict:
