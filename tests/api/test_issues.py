@@ -134,7 +134,7 @@ def test_issue_modify(app, mock_model_methods):
         ("delete", (f"/api/v0/issues/{_ISSUE_ID}",), {}),
     ],
 )
-def test_issue_modify_404(action, args, kwargs, app, monkeypatch):
+def test_issue_404(action, args, kwargs, app, monkeypatch):
     monkeypatch.setattr(Issue, "find_by_id", lambda *_: None)
     actions = {"patch": app.patch, "delete": app.delete, "get": app.get, "post": app.post}
     response = actions[action](*args, **kwargs)

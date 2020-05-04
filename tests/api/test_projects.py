@@ -1,8 +1,10 @@
 import pytest
+from backend.models.issues import Issue
 from backend.models.projects import Project
 
 
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
+_ISSUE_ID = "789056abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
 
@@ -19,6 +21,7 @@ def get_demo_project(*args, **kwargs):
 def mock_model_methods(monkeypatch):
     for prop in ["find_by_id", "modify", "delete"]:
         monkeypatch.setattr(Project, prop, get_demo_project)
+    monkeypatch.setattr(Project, "get_issues", list)
 
 
 @pytest.fixture
@@ -80,22 +83,12 @@ def test_create_project(app):
             "Missing required key: maintainer.",
         ),
         ({"json": {"description": "Any description"}}, "Missing required keys: maintainer, name."),
-        (
-            {
-                "json": {
-                    "name": "Test through an API.",
-                    "maintainer": _MAINTAINER_ID,
-                    "description": "Any description",
-                }
-            },
-            "Internal Server Error",
-        ),
     ],
 )
 def test_create_project_failed(data, expected, app, mock_model_save):
     # 500: an error produce by the database
     response = app.post("/api/v0/projects", **data)
-    assert response.status_code in {400, 500}
+    assert response.status_code == 400
 
     error = response.get_json()
     assert error["message"] == expected
@@ -112,39 +105,9 @@ def test_get_project(app, mock_model_methods):
 
 
 @pytest.mark.api
-def test_get_project_failed(app, monkeypatch):
-    monkeypatch.setattr(
-        Project, "find_by_id", lambda _: None,
-    )
-    response = app.get(f"/api/v0/projects/{_PROJECT_ID}")
-
-    assert response.status_code == 404
-    project = response.get_json()
-    assert project["message"] == "Required project is missing"
-
-
-@pytest.mark.api
 def test_project_delete(app, mock_model_methods):
     response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
     assert response.status_code == 204
-
-
-@pytest.mark.api
-def test_project_delete_404(app, monkeypatch):
-    monkeypatch.setattr(Project, "find_by_id", lambda *_: None)
-    response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
-
-    assert response.status_code == 404
-    assert response.get_json()["message"] == "Required project is missing"
-
-
-@pytest.mark.api
-def test_project_delete_500(app, mock_model_methods, mock_model_save):
-    # an error produce by the database
-    response = app.delete(f"/api/v0/projects/{_PROJECT_ID}")
-
-    assert response.status_code == 500
-    assert response.get_json()["message"] == "Internal Server Error"
 
 
 @pytest.mark.api
@@ -155,18 +118,95 @@ def test_modify_project(app, mock_model_methods):
 
 
 @pytest.mark.api
-def test_project_modify_404(app, monkeypatch):
+def test_project_get_issues(app, mock_model_methods):
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues")
+
+    assert response.status_code == 200
+    assert response.get_json() == []
+
+
+@pytest.mark.api
+def test_project_get_issue_by_id(app, mock_model_methods, monkeypatch):
+    # GIVEN
+    issue = Issue(
+        **{
+            "id": _ISSUE_ID,
+            "title": "Test createIssue",
+            "assignee": _MAINTAINER_ID,
+            "reporter": _MAINTAINER_ID,
+            "project": _PROJECT_ID,
+        }
+    )
+    monkeypatch.setattr(Project, "get_issue", lambda *_: issue)
+    # WHEN
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}")
+    # THEN
+    assert response.status_code == 200
+    assert response.get_json()["id"] == _ISSUE_ID
+
+
+@pytest.mark.api
+def test_project_get_issue_by_id_404(app, mock_model_methods, monkeypatch):
+    # GIVEN
+    monkeypatch.setattr(Project, "get_issue", lambda *_: None)
+    # WHEN
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}")
+    # THEN
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required issue is missing"
+
+
+@pytest.mark.api
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        (
+            "patch",
+            (f"/api/v0/projects/{_PROJECT_ID}",),
+            {"json": {"title": "Test an issue modification"}},
+        ),
+        ("get", (f"/api/v0/projects/{_PROJECT_ID}",), {}),
+        ("get", (f"/api/v0/projects/{_PROJECT_ID}/issues",), {}),
+        ("get", (f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}",), {}),
+        ("delete", (f"/api/v0/projects/{_PROJECT_ID}",), {}),
+    ],
+)
+def test_project_404(action, args, kwargs, app, monkeypatch):
     monkeypatch.setattr(Project, "find_by_id", lambda *_: None)
-    response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
+    actions = {"patch": app.patch, "delete": app.delete, "get": app.get, "post": app.post}
+    response = actions[action](*args, **kwargs)
 
     assert response.status_code == 404
     assert response.get_json()["message"] == "Required project is missing"
 
 
 @pytest.mark.api
-def test_project_modify_500(app, mock_model_methods, mock_model_save):
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        (
+            "post",
+            (f"/api/v0/projects",),
+            {
+                "json": {
+                    "name": "Test through an API.",
+                    "maintainer": _MAINTAINER_ID,
+                    "description": "Any description",
+                }
+            },
+        ),
+        (
+            "patch",
+            (f"/api/v0/projects/{_PROJECT_ID}",),
+            {"json": {"name": "Test a projectD modification"}},
+        ),
+        ("delete", (f"/api/v0/projects/{_PROJECT_ID}",), {}),
+    ],
+)
+def test_project_500(action, args, kwargs, app, mock_model_methods, mock_model_save):
     # an error produce by the database
-    response = app.patch(f"/api/v0/projects/{_PROJECT_ID}", json={"name": "New name"})
+    actions = {"patch": app.patch, "delete": app.delete, "post": app.post}
+    response = actions[action](*args, **kwargs)
 
     assert response.status_code == 500
     assert response.get_json()["message"] == "Internal Server Error"

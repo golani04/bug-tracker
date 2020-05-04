@@ -2,6 +2,7 @@ from dataclasses import asdict, fields, is_dataclass
 from datetime import date, timedelta
 from freezegun import freeze_time
 
+import pytest
 from backend.models.issues import Issue, Status, Severity
 
 _ISSUE_ID = "567890abcdefghijklmnopqrstuvwxyz" * 2
@@ -173,3 +174,46 @@ def test_issue_modify_saved(app):
     issue = Issue.find_by_id(_EXISTING_ISSUE_ID)
     # then
     assert issue.title == "Issue 111"
+
+
+@pytest.mark.parametrize(
+    "props,expected",
+    [
+        ({"status": 3}, 7),
+        ({"status": 3, "severity": 1}, 5),
+        (
+            {
+                "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
+                "severity": 3,
+            },
+            4,
+        ),
+        (
+            {
+                "reporter": "e987d73796d01049b5f7155f59415baad03029cb75fed88b525513637252c2dd",
+                "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
+            },
+            1,
+        ),
+    ],
+)
+def test_search_issues_values_eq(props, expected, app):
+    assert len(Issue.search(props)) == expected
+
+
+@pytest.mark.parametrize(
+    "props,expected",
+    [
+        (
+            {"id": "6c7ce96a6d7502e89b93d54744389f800d0ab317cffc75caf7e0815c56fae438", "status": 3},
+            7,
+        ),
+        ({"status": 3, "severity": 1, "title": "Lorem ipsum"}, 5),
+    ],
+)
+def test_search_issues_values_eq_unsearch_props(props, expected, app):
+    assert len(Issue.search(props)) == expected
+
+
+def test_search_issues_values_eq_fails(app):
+    assert Issue.search({"status": 5, "severity": 0}) == []

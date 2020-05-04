@@ -2,7 +2,7 @@ from typing import Dict
 from flask import jsonify
 
 from backend.api import bp
-from backend.api.errors import error_response
+from backend.api.errors import error_response, not_found
 from backend.api.util import (
     check_requested_data,
     check_required_keys,
@@ -15,7 +15,7 @@ from backend.models.projects import Project
 
 @bp.route("/projects", methods=["GET"])
 def get_projects():
-    return jsonify(list(Project.get_all().values())), 200
+    return jsonify([project.to_dict() for project in Project.get_all().values()]), 200
 
 
 @bp.route("/projects", methods=["POST"])
@@ -33,6 +33,21 @@ def create_project(data: Dict):
 @check_item_exists(Project, "Required project is missing")
 def get_project(project: Project):
     return jsonify(project.to_dict()), 200
+
+
+@bp.route("/projects/<string:item_id>/issues/<string:issue_id>", methods=["GET"])
+@check_item_exists(Project, "Required project is missing")
+def get_project_issue(project: Project, issue_id: str):
+    issue = project.get_issue(issue_id)
+    if issue is None:
+        return not_found("Required issue is missing")
+    return jsonify(issue.to_dict()), 200
+
+
+@bp.route("/projects/<string:item_id>/issues", methods=["GET"])
+@check_item_exists(Project, "Required project is missing")
+def get_project_issues(project: Project):
+    return jsonify([issue.to_dict() for issue in project.get_issues()]), 200
 
 
 @bp.route("/projects/<string:item_id>", methods=["PATCH"])

@@ -2,12 +2,14 @@ import pytest
 from datetime import date, datetime
 from freezegun import freeze_time
 
+from backend.models.issues import Issue
 from backend.models.projects import Project
 from backend.models.validate import ValidationError
 
 
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
+_EXISTING_PROJECT = "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c"
 
 
 @freeze_time("2020-01-01 12:01:01.123456")
@@ -95,7 +97,7 @@ def test_project_save(app):
 
 
 def test_find_project(app):
-    project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    project = Project.find_by_id(_EXISTING_PROJECT)
     assert project is not None
 
 
@@ -105,7 +107,7 @@ def test_find_project_failed(app):
 
 
 def test_delete_project(app):
-    project = Project.find_by_id("c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c")
+    project = Project.find_by_id(_EXISTING_PROJECT)
     assert project.delete() is not None
     assert any(project_id == project.id for project_id in Project.get_all()) is False
 
@@ -136,3 +138,57 @@ def test_modify_project_id_is_not_changed(app):
     updated_project = project.modify({"id": "a" * 64})
     # THEN
     assert project.id == updated_project.id == _PROJECT_ID != "a" * 64
+
+
+def test_get_issues_of_the_project(app):
+    project = Project.find_by_id(_EXISTING_PROJECT)
+
+    assert project is not None
+    assert project.issues == set()
+
+    project_issues = Issue.search({"project": project.id})
+    assert len(project_issues) > 0
+
+    project_issues_from_self = project.get_issues()
+    assert len(project_issues) == len(project.issues) == len(project_issues_from_self)
+    assert set(project.issues) == {issue.id for issue in project_issues_from_self}
+
+
+_ISSUE_FROM_EXSTING_PROJECT = "c7b2e1bef0cfdeb959c0382a1ba63c4125e261ea245e7d86428b0244141cc34a"
+
+
+def test_get_issue_of_the_project_issues_empty(app):
+    project = Project.find_by_id(_EXISTING_PROJECT)
+    assert project is not None
+
+    issue = project.get_issue(_ISSUE_FROM_EXSTING_PROJECT)
+
+    assert issue is not None
+    assert issue.id == _ISSUE_FROM_EXSTING_PROJECT
+
+
+def test_get_issue_of_the_project_issues_not_empty(app):
+    project = Project.find_by_id(_EXISTING_PROJECT)
+    assert project is not None
+
+    # WHEN, will for sure update project.issues
+    project.get_issues()
+    assert project.issues
+
+    issue = project.get_issue(_ISSUE_FROM_EXSTING_PROJECT)
+    assert issue is not None
+    assert issue.id == _ISSUE_FROM_EXSTING_PROJECT
+    assert issue.id in project.issues
+
+
+def test_required_issue_is_none(app):
+    project = Project.find_by_id(_EXISTING_PROJECT)
+    assert project is not None
+
+    issue = project.get_issue("abcd" * 16)
+    assert issue is None
+
+    # WHEN, will for sure update project.issues
+    project.get_issues()
+    assert project.issues
+    assert "abcd" * 16 not in project.issues

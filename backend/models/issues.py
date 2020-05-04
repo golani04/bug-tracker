@@ -2,7 +2,7 @@ from dataclasses import asdict, dataclass, field, replace
 from datetime import date, timedelta
 from enum import Enum
 from functools import lru_cache
-from typing import ClassVar, Dict, List, Optional, Set
+from typing import Any, ClassVar, Dict, List, Optional, Set
 
 from flask import escape
 from backend import database as db
@@ -36,6 +36,18 @@ class Issue:
     # define class variable
     unchangeable_props: ClassVar[Set] = {"id", "created", "project", "reporter"}
     required_props: ClassVar[Set] = {"assignee", "title", "project", "reporter"}
+    # if id provided other properties are irrelevant
+    # TODO: title, date, due, time_spent add to search
+    unsearchable_props: ClassVar[Set] = {
+        "id",
+        "links",
+        "comments",
+        "description",
+        "title",
+        "date",
+        "due",
+        "time_spent",
+    }
 
     def __post_init__(self):
         # validate props
@@ -66,7 +78,7 @@ class Issue:
 
     @classmethod
     @lru_cache(1)
-    def get_all(cls) -> List["Issue"]:
+    def get_all(cls) -> Dict[str, "Issue"]:
         return {issue["id"]: cls(**issue) for issue in db.get_issues()}
 
     @staticmethod
@@ -76,7 +88,7 @@ class Issue:
            complex types to the type that can be JSON serializable.
         """
 
-        def serialize_values(val):
+        def serialize_values(val) -> Any:
             _stringify_this_types = (date,)
             if isinstance(val, _stringify_this_types):
                 return str(val)
@@ -101,14 +113,42 @@ class Issue:
     def find_by_id(cls, id_: str) -> Optional["Issue"]:
         return cls.get_all().get(id_)
 
-    def delete(self):
+    @classmethod
+    def search(cls, props: Dict) -> List["Issue"]:
+        # TODO: Naive search, search is linear and searches by equality only
+        def deserialize(props: Dict, unsearchable_props: Set) -> Dict:
+            deserialize_props = {}
+            for k in props:
+                if k in unsearchable_props:
+                    continue
+                if k in {"label", "status", "severity"}:
+                    enums = {"label": Label, "status": Status, "severity": Severity}
+                    deserialize_props[k] = enums[k](props[k])
+                else:
+                    deserialize_props[k] = props[k]
+
+            return deserialize_props
+
+        try:
+            # try, if enums' values are invalid
+            props = deserialize(props, cls.unsearchable_props)
+        except ValueError:
+            return []
+
+        return [
+            issue
+            for issue in cls.get_all().values()
+            if all(getattr(issue, k, None) == v for k, v in props.items())
+        ]
+
+    def delete(self) -> "Issue":
         return self.get_all().pop(self.id)
 
-    def modify(self, data: Dict):
+    def modify(self, data: Dict) -> "Issue":
         filterd_data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
         return replace(self, **filterd_data)
 
-    def save(self, state: str):
+    def save(self, state: str) -> bool:
         issues = self.get_all()
         if state in {"create", "modify"}:
             issues[self.id] = self
