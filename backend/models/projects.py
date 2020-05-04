@@ -27,7 +27,7 @@ class Project:
     # FK, that collect all items that is connected to project
     tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
-    issues: List[str] = field(default_factory=list, repr=False, compare=False)
+    issues: Set[str] = field(default_factory=set, repr=False, compare=False)
     # define class variable
     unchangeable_props: ClassVar[Set] = {"id", "created", "updated"}
 
@@ -59,6 +59,13 @@ class Project:
     @classmethod
     def find_by_id(cls, id_: str) -> Optional["Project"]:
         return cls.get_all().get(id_)
+
+    def get_issue(self, issue_id: str) -> Optional[Issue]:
+        issue = Issue.find_by_id(issue_id)
+        if not self.issues:
+            return issue if issue is not None and self.id == issue.project else None
+
+        return issue if issue_id in self.issues else None
 
     def get_issues(self) -> List[Issue]:
         project_issues = []
