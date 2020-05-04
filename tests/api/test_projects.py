@@ -19,6 +19,7 @@ def get_demo_project(*args, **kwargs):
 def mock_model_methods(monkeypatch):
     for prop in ["find_by_id", "modify", "delete"]:
         monkeypatch.setattr(Project, prop, get_demo_project)
+    monkeypatch.setattr(Project, "get_issues", list)
 
 
 @pytest.fixture
@@ -170,3 +171,11 @@ def test_project_modify_500(app, mock_model_methods, mock_model_save):
 
     assert response.status_code == 500
     assert response.get_json()["message"] == "Internal Server Error"
+
+
+@pytest.mark.api
+def test_project_get_issues(app, mock_model_methods):
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues")
+
+    assert response.status_code == 200
+    assert response.get_json() == []
