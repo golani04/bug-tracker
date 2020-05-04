@@ -2,7 +2,7 @@ from typing import Dict
 from flask import jsonify
 
 from backend.api import bp
-from backend.api.errors import error_response
+from backend.api.errors import error_response, not_found
 from backend.api.util import (
     check_requested_data,
     check_required_keys,
@@ -33,6 +33,15 @@ def create_project(data: Dict):
 @check_item_exists(Project, "Required project is missing")
 def get_project(project: Project):
     return jsonify(project.to_dict()), 200
+
+
+@bp.route("/projects/<string:item_id>/issues/<string:issue_id>", methods=["GET"])
+@check_item_exists(Project, "Required project is missing")
+def get_project_issue(project: Project, issue_id: str):
+    issue = project.get_issue(issue_id)
+    if issue is None:
+        return not_found("Required issue is missing")
+    return jsonify(issue.to_dict()), 200
 
 
 @bp.route("/projects/<string:item_id>/issues", methods=["GET"])

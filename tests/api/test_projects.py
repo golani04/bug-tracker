@@ -1,8 +1,10 @@
 import pytest
+from backend.models.issues import Issue
 from backend.models.projects import Project
 
 
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
+_ISSUE_ID = "789056abcdefghijklmnopqrstuvwxyz" * 2
 _MAINTAINER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 
 
@@ -124,6 +126,37 @@ def test_project_get_issues(app, mock_model_methods):
 
 
 @pytest.mark.api
+def test_project_get_issue_by_id(app, mock_model_methods, monkeypatch):
+    # GIVEN
+    issue = Issue(
+        **{
+            "id": _ISSUE_ID,
+            "title": "Test createIssue",
+            "assignee": _MAINTAINER_ID,
+            "reporter": _MAINTAINER_ID,
+            "project": _PROJECT_ID,
+        }
+    )
+    monkeypatch.setattr(Project, "get_issue", lambda *_: issue)
+    # WHEN
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}")
+    # THEN
+    assert response.status_code == 200
+    assert response.get_json()["id"] == _ISSUE_ID
+
+
+@pytest.mark.api
+def test_project_get_issue_by_id_404(app, mock_model_methods, monkeypatch):
+    # GIVEN
+    monkeypatch.setattr(Project, "get_issue", lambda *_: None)
+    # WHEN
+    response = app.get(f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}")
+    # THEN
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required issue is missing"
+
+
+@pytest.mark.api
 @pytest.mark.parametrize(
     "action,args,kwargs",
     [
@@ -134,6 +167,7 @@ def test_project_get_issues(app, mock_model_methods):
         ),
         ("get", (f"/api/v0/projects/{_PROJECT_ID}",), {}),
         ("get", (f"/api/v0/projects/{_PROJECT_ID}/issues",), {}),
+        ("get", (f"/api/v0/projects/{_PROJECT_ID}/issues/{_ISSUE_ID}",), {}),
         ("delete", (f"/api/v0/projects/{_PROJECT_ID}",), {}),
     ],
 )
