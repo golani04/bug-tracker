@@ -190,7 +190,7 @@ def test_issue_modify_saved(app):
         ),
         (
             {
-                "reporter": "e987d73796d01049b5f7155f59415baad03029cb75fed88b525513637252c2dd",
+                "reporter": "f1120082590e21a79396b79cbb1995c4f5f090171dcad05ac899cb1d6ed8905b",
                 "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
             },
             1,
