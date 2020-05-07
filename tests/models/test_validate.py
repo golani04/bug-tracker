@@ -108,3 +108,41 @@ def test_is_time_dict(time_obj):
 def test_is_time_dict_raises(time_obj):
     with pytest.raises(validate.ValidationError):
         assert validate.is_time_dict(time_obj)
+
+
+@pytest.mark.parametrize(
+    "email",
+    [
+        "example@example.com",
+        "a@b.design",
+        "b@example.com.cn",
+        "leo.sp&*-_+2004@gmail.com",
+        "123456789@gmail.com",
+        "design@mail.design",
+        "design@g-mail.design",
+    ],
+)
+def test_validate_emails(email):
+    assert validate.email(email)
+
+
+@pytest.mark.parametrize(
+    "email",
+    [
+        # no support for intenalization emails
+        "леонид@mail.рф",
+        "狮子座@example.com.中国",
+        # unallowed chars
+        r"b[a]{s}/|\ad@gmail.com",
+        "leo@sp@gmail.com",
+        "asdf@gmail.asdfghjt",
+        "asdf@gma&il.com",
+        "asdf@gmail.c-om",
+        "><script>alert('XSS')</script><@gmail.com",
+    ],
+)
+def test_validate_emails_fails(email):
+    with pytest.raises(validate.ValidationError) as excinfo:
+        validate.email(email)
+
+    assert str(excinfo.value) == f"Email is invalid: {email}"

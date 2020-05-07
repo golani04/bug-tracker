@@ -7,6 +7,10 @@ from typing import Dict, List, Union
 
 
 _ALPHANUMERIC = re.compile(r"[^A-Za-z0-9]+")
+# https://owasp.org/www-community/OWASP_Validation_Regex_Repository
+_NAIVE_EMAIL_REGEX = re.compile(
+    r"^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$"
+)
 
 
 @dataclass
@@ -90,3 +94,10 @@ def is_time_dict(time_obj: Union[Dict[str, int], int, float]) -> bool:
     # is_numeric will raise a ValidationError
     if is_numeric(time_obj):
         return True
+
+
+def email(addr: str) -> bool:
+    if re.fullmatch(_NAIVE_EMAIL_REGEX, addr) is not None:
+        return True
+
+    raise ValidationError(f"Email is invalid: {addr}")
