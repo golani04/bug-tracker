@@ -140,7 +140,7 @@ def test_modify_project_id_is_not_changed(app):
     assert project.id == updated_project.id == _PROJECT_ID != "a" * 64
 
 
-def test_get_issues_of_the_project(app):
+def test_get_issues_of_the_project_none(app):
     project = Project.find_by_id(_EXISTING_PROJECT)
 
     assert project is not None
@@ -152,6 +152,19 @@ def test_get_issues_of_the_project(app):
     project_issues_from_self = project.get_issues()
     assert len(project_issues) == len(project.issues) == len(project_issues_from_self)
     assert set(project.issues) == {issue.id for issue in project_issues_from_self}
+
+
+def test_get_issues_of_the_project_not_empty(app):
+    project = Project.find_by_id(_EXISTING_PROJECT)
+    assert project is not None
+    # WHEN, store project's issues to DB
+    project.get_issues()
+    assert project.issues
+
+    # Fetch issues based on stored keys in issues list on class
+    issues = [issue.id for issue in Issue.get_all().values() if issue.project == project.id]
+    issues_via_project = {issue.id for issue in project.get_issues()}
+    assert set(issues) == set(project.issues) == set(issues_via_project)
 
 
 _ISSUE_FROM_EXSTING_PROJECT = "c7b2e1bef0cfdeb959c0382a1ba63c4125e261ea245e7d86428b0244141cc34a"
