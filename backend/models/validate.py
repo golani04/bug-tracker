@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Dict, List, Union
 
+from backend.lib import const
 
 _ALPHANUMERIC = re.compile(r"[^A-Za-z0-9]+")
 # https://owasp.org/www-community/OWASP_Validation_Regex_Repository
@@ -101,3 +102,12 @@ def email(addr: str) -> bool:
         return True
 
     raise ValidationError(f"Email is invalid: {addr}")
+
+
+def password(passw: str) -> bool:
+    if len(passw) < const.MIN_PASSWORD_LEN:
+        raise ValidationError(
+            f"Short password. Minimum length is {const.MIN_PASSWORD_LEN}, got {len(passw)}"
+        )
+
+    return True

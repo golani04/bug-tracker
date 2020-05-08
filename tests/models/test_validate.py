@@ -2,6 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 
 import pytest
+from backend.lib import const
 from backend.models import validate
 
 
@@ -146,3 +147,14 @@ def test_validate_emails_fails(email):
         validate.email(email)
 
     assert str(excinfo.value) == f"Email is invalid: {email}"
+
+
+def test_validate_password():
+    # password is require only minimum length
+    assert const.MIN_PASSWORD_LEN == 8
+    assert validate.password("asdfghjk")
+    # if less
+    with pytest.raises(validate.ValidationError) as excinfo:
+        validate.password("passwrd")
+
+    assert str(excinfo.value) == "Short password. Minimum length is 8, got 7"
