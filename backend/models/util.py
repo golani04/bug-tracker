@@ -1,6 +1,7 @@
 import secrets
 from datetime import date, datetime, timedelta
 from enum import Enum
+from passlib.hash import bcrypt
 from typing import Any, Dict, Optional, Union
 
 
@@ -64,3 +65,11 @@ def wdhms_to_seconds(wdmhs: Union[Dict[str, int], int]) -> int:
             [dict]: {'weeks': 0, 'days': 0, 'hours': 0, 'minutes':0, 'seconds': 0}
     """
     return wdmhs if isinstance(wdmhs, (int, float)) else timedelta(**wdmhs).total_seconds()
+
+
+def hash_password(passw: str) -> str:
+    return bcrypt.hash(passw)
+
+
+def verify_password(passw: str, hashed: str) -> bool:
+    return bcrypt.verify(passw, hashed)

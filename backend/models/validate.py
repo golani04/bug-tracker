@@ -5,8 +5,13 @@ from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Dict, List, Union
 
+from backend.lib import const
 
 _ALPHANUMERIC = re.compile(r"[^A-Za-z0-9]+")
+# https://owasp.org/www-community/OWASP_Validation_Regex_Repository
+_NAIVE_EMAIL_REGEX = re.compile(
+    r"^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$"
+)
 
 
 @dataclass
@@ -90,3 +95,19 @@ def is_time_dict(time_obj: Union[Dict[str, int], int, float]) -> bool:
     # is_numeric will raise a ValidationError
     if is_numeric(time_obj):
         return True
+
+
+def email(addr: str) -> bool:
+    if re.fullmatch(_NAIVE_EMAIL_REGEX, addr) is not None:
+        return True
+
+    raise ValidationError(f"Email is invalid: {addr}")
+
+
+def password(passw: str) -> bool:
+    if len(passw) < const.MIN_PASSWORD_LEN:
+        raise ValidationError(
+            f"Short password. Minimum length is {const.MIN_PASSWORD_LEN}, got {len(passw)}"
+        )
+
+    return True
