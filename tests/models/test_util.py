@@ -97,3 +97,12 @@ def test_wdhms_to_seconds(wdhms):
     )
 
     assert util.wdhms_to_seconds(wdhms) == expected
+
+
+def test_hash_password():
+    assert "password" != util.hash_password("password")
+
+
+def test_verify_password():
+    h = util.hash_password("password")
+    assert util.verify_password("password", h)
