@@ -5,11 +5,14 @@ from backend.models import validate
 from backend.models.users import User, UserType
 
 _USER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
+_PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 
 
 @freeze_time("2020-01-01")
 def test_user_class():
-    user = User(_USER_ID, "Tester>", "test@&12345", "tester@gmail.com", "password", type=5)
+    user = User(
+        _USER_ID, "Tester>", "test@&12345", "tester@gmail.com", "password", _PROJECT_ID, type=5
+    )
     assert user.type == UserType(5)
     assert user.name == "Tester&gt;"
     assert user.username == "test@&amp;12345"
@@ -26,6 +29,6 @@ def test_user_class():
 )
 def test_user_class_invalid(id_, email, type_, err):
     with pytest.raises(validate.ValidationError) as excinfo:
-        User(id_, "Tester", "test", email, "password", type=type_)
+        User(id_, "Tester", "test", email, "password", _PROJECT_ID, type=type_)
 
     assert str(excinfo.value) == err
