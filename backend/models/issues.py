@@ -35,6 +35,7 @@ class Issue:
     # TODO: images: List[str] = field(default_factory=list)
     # define class variable
     unchangeable_props: ClassVar[Set] = {"id", "created", "project", "reporter"}
+    # TODO: insure that this set is needed
     required_props: ClassVar[Set] = {"assignee", "title", "project", "reporter"}
     # if id provided other properties are irrelevant
     # TODO: title, date, due, time_spent add to search
