@@ -1,27 +1,35 @@
 import json
 import pytest
+from _pytest.tmpdir import TempdirFactory
 from collections import namedtuple
-from typing import NamedTuple
+from functools import partial
+from typing import types, NamedTuple
 
 from backend import create_app, models
-from tests.data import projects, issues
+from tests.data import projects, issues, users
 
 
 @pytest.fixture
 def test_config() -> NamedTuple:
-    return namedtuple("TestConfig", "PROJECTS_PATH ISSUES_PATH")
+    return namedtuple("TestConfig", "PROJECTS_PATH ISSUES_PATH USERS_PATH")
+
+
+def set_path(td: TempdirFactory, module: types.ModuleType):
+    name = module.__name__.split(".")[-1]
+    f_path = td.mktemp(name).join(f"{name}.json")
+    f_path.write(json.dumps(module._data))
+
+    return f_path
 
 
 @pytest.fixture
 def tmp_config(tmpdir_factory, test_config: NamedTuple) -> NamedTuple:
-    # create propject json
-    f_projects = tmpdir_factory.mktemp("projects").join("projects.json")
-    f_projects.write(json.dumps(projects._data))
-    # create issue json
-    f_issues = tmpdir_factory.mktemp("issues").join("issues.json")
-    f_issues.write(json.dumps(issues._data))
-
-    return test_config(PROJECTS_PATH=f_projects, ISSUES_PATH=f_issues)
+    _set_path = partial(set_path, tmpdir_factory)
+    return test_config(
+        PROJECTS_PATH=_set_path(projects),
+        ISSUES_PATH=_set_path(issues),
+        USERS_PATH=_set_path(users),
+    )
 
 
 @pytest.fixture
