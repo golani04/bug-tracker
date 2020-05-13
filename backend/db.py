@@ -35,3 +35,9 @@ class DB:
 
     def save_issues(self, issues: List[Dict]) -> bool:
         return _save_json(self.config.ISSUES_PATH, issues)
+
+    def get_users(self) -> List[Dict]:
+        return _read_json(self.config.USERS_PATH)
+
+    def save_users(self, users: List[Dict]) -> bool:
+        return _save_json(self.config.USERS_PATH, users)
