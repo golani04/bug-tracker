@@ -1,7 +1,7 @@
 from datetime import date
 from freezegun import freeze_time
 import pytest
-from backend.models import validate
+from backend.models import validate, util
 from backend.models.users import User, UserType
 
 _USER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
@@ -11,12 +11,20 @@ _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
 @freeze_time("2020-01-01")
 def test_user_class():
     user = User(
-        _USER_ID, "Tester>", "test@&12345", "tester@gmail.com", "password", _PROJECT_ID, type=5
+        _USER_ID,
+        "Tester>",
+        "test@&12345",
+        "tester@gmail.com",
+        util.hash_password("password"),
+        _PROJECT_ID,
+        type=5,
     )
     assert user.type == UserType(5)
     assert user.name == "Tester&gt;"
     assert user.username == "test@&amp;12345"
     assert user.created == date(2020, 1, 1)
+    assert user.password != "password"
+    assert util.verify_password("password", user.password)
 
 
 @pytest.mark.parametrize(
