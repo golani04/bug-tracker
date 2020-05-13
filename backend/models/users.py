@@ -1,8 +1,8 @@
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from enum import Enum
 from functools import lru_cache
-from typing import Dict
+from typing import Dict, Union
 
 from flask import escape
 from backend import database as db
@@ -37,3 +37,24 @@ class User:
     @lru_cache(1)
     def get_all(cls) -> Dict[str, "User"]:
         return {user["id"]: cls(**user) for user in db.get_users()}
+
+    @staticmethod
+    def _convert_to_custom_dict(user: "User") -> Dict:
+        """Convert dataclass to json serializable dict.
+           Exclude fields that should not be stored, and convert the
+           complex types to the type that can be JSON serializable.
+        """
+
+        def convert(v: Union[str, Enum]):
+            _stringify = (date,)
+            if isinstance(v, _stringify):
+                return str(v)
+            if isinstance(v, Enum):
+                return v.value
+
+            return v
+
+        return {k: convert(v) for k, v in asdict(user).items()}
+
+    def to_dict(self) -> Dict:
+        return self._convert_to_custom_dict(self)
