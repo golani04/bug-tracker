@@ -40,3 +40,10 @@ def test_user_class_invalid(id_, email, type_, err):
         User(id_, "Tester", "test", email, "password", _PROJECT_ID, type=type_)
 
     assert str(excinfo.value) == err
+
+
+def test_get_all_users(app):
+    users = User.get_all()
+
+    assert users != []
+    assert len(users) == 10
