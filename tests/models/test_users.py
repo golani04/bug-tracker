@@ -68,3 +68,23 @@ def test_create_user():
     assert user.id != _USER_ID
     assert user.created == date(2020, 1, 1)
     assert user.type == UserType.developer
+
+
+def test_create_user_save(app):
+    user = User.create(
+        {
+            "id": _USER_ID,
+            "created": "2019-10-10",
+            "name": "Test create",
+            "username": "test@create",
+            "email": "test@test.com",
+            "password": "password",
+            "project": _PROJECT_ID,
+            "type": 3,
+        }
+    )
+
+    user.save("create")
+    users = User.get_all()
+    assert users[user.id] == user
+    assert len(users) == 11

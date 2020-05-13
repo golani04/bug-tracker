@@ -72,3 +72,13 @@ class User:
 
     def to_dict(self) -> Dict:
         return self._convert_to_custom_dict(self)
+
+    def save(self, state: str = None) -> bool:
+        users = self.get_all()
+        if state in {"create", "modify"}:
+            users[self.id] = self
+
+        # clear cache
+        self.get_all.cache_clear()
+
+        return db.save_users([user.to_dict() for user in users.values()])
