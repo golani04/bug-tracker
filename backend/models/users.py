@@ -38,6 +38,20 @@ class User:
     def get_all(cls) -> Dict[str, "User"]:
         return {user["id"]: cls(**user) for user in db.get_users()}
 
+    @classmethod
+    def create(cls, user: Dict) -> "User":
+        # check if password is short
+        password = user.pop("password")
+        validate.password(password)
+        return cls(
+            **{
+                **user,
+                "id": util.create_id(),
+                "created": date.today(),
+                "password": util.hash_password(password),
+            }
+        )
+
     @staticmethod
     def _convert_to_custom_dict(user: "User") -> Dict:
         """Convert dataclass to json serializable dict.

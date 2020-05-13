@@ -47,3 +47,24 @@ def test_get_all_users(app):
 
     assert users != []
     assert len(users) == 10
+
+
+@freeze_time("2020-01-01")
+def test_create_user():
+    user = User.create(
+        {
+            "id": _USER_ID,
+            "created": "2019-10-10",
+            "name": "Test create",
+            "username": "test@create",
+            "email": "test@test.com",
+            "password": "password",
+            "project": _PROJECT_ID,
+            "type": 3,
+        }
+    )
+
+    assert user.id is not None
+    assert user.id != _USER_ID
+    assert user.created == date(2020, 1, 1)
+    assert user.type == UserType.developer
