@@ -41,3 +41,4 @@ def app(tmp_config: NamedTuple):
 
     models.projects.Project.get_all.cache_clear()
     models.issues.Issue.get_all.cache_clear()
+    models.users.User.get_all.cache_clear()

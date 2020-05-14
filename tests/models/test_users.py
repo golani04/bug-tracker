@@ -5,7 +5,9 @@ from backend.models import validate, util
 from backend.models.users import User, UserType
 
 _USER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
+_EXISTING_USER_ID = "f773f6953b0ca528aa6d874d93a479a1f14540cd6c4edb972c5faa7c6708cc17"
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
+_EXISTING_PROJECT_ID = "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c"
 
 
 @freeze_time("2020-01-01")
@@ -88,3 +90,50 @@ def test_create_user_save(app):
     users = User.get_all()
     assert users[user.id] == user
     assert len(users) == 11
+
+
+def test_find_id(app):
+    assert User.find_by_id(_PROJECT_ID) is None
+    assert User.find_by_id(_EXISTING_USER_ID) is not None
+
+
+def test_delete_user(app):
+    user = User.find_by_id(_EXISTING_USER_ID)
+    assert len(User.get_all()) == 10
+
+    deleted_user = user.delete()
+    user.save("delete")
+    assert deleted_user.id == user.id
+    assert len(User.get_all()) == 9
+
+
+@freeze_time("2020-01-01")
+@pytest.mark.parametrize(
+    "prop, val, expected",
+    [
+        ("name", "Test create", "Test create"),
+        ("username", "test@create", "test@create"),
+        ("email", "test@test.com", "test@test.com"),
+        ("type", 5, UserType(5)),
+        # unchangeable keys
+        ("id", _USER_ID, _EXISTING_USER_ID),
+        ("project", _PROJECT_ID, _EXISTING_PROJECT_ID),
+        ("created", "2019-10-10", date(2020, 1, 1)),
+    ],
+)
+def test_modify_user(app, prop, val, expected):
+    user = User.find_by_id(_EXISTING_USER_ID)
+    user = user.modify({prop: val})
+
+    assert getattr(user, prop) == expected
+
+
+def test_modify_user_password(app):
+    user = User.find_by_id(_EXISTING_USER_ID)
+    passw = "new_password"
+    user = user.modify({"password": passw})
+    assert util.verify_password(passw, user.password)
+
+    user.save("modify")
+    user = User.get_all()[_EXISTING_USER_ID]
+    assert util.verify_password(passw, user.password)
