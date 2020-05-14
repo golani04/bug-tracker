@@ -44,3 +44,13 @@ def update_user(user: User, data: Dict):
     if user.save("modify") is False:
         return error_response(500)
     return jsonify(user.to_dict()), 200
+
+
+@bp.route("/users/<string:item_id>", methods=["DELETE"])
+@check_item_exists(User, "Required user is missing")
+def delete_user(user: User):
+    user.delete()
+    if user.save("delete") is False:
+        return error_response(500)
+
+    return jsonify(), 204

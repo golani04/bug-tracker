@@ -100,7 +100,7 @@ def test_create_user(app):
             "Missing required key: password.",
         ),
         (
-            {"json": {"username": "tester", "email": "tester@gmail.com",}},
+            {"json": {"username": "tester", "email": "tester@gmail.com"}},
             "Missing required keys: name, password, project.",
         ),
     ],
@@ -128,3 +128,9 @@ def test_modify_users(app, mock_model_methods):
     response = app.patch(f"/api/v0/users/{_USER_ID}", json={"name": "New name"})
 
     assert response.status_code == 200
+
+
+@pytest.mark.api
+def test_user_delete(app, mock_model_methods):
+    response = app.delete(f"/api/v0/users/{_USER_ID}")
+    assert response.status_code == 204
