@@ -3,7 +3,12 @@ from flask import jsonify
 
 from backend.api import bp
 from backend.api.errors import error_response
-from backend.api.util import check_requested_data, check_required_keys, check_item_exists
+from backend.api.util import (
+    check_requested_data,
+    check_required_keys,
+    check_item_exists,
+    filter_unchangeable_keys,
+)
 
 from backend.models.users import User
 
@@ -29,3 +34,13 @@ def create_user(data: Dict):
 def get_user(user: User):
     return jsonify(user.to_dict()), 200
 
+
+@bp.route("/users/<string:item_id>", methods=["PATCH"])
+@check_requested_data
+@filter_unchangeable_keys(User.unchangeable_props)
+@check_item_exists(User, "Required user is missing")
+def update_user(user: User, data: Dict):
+    user = user.modify(data)
+    if user.save("modify") is False:
+        return error_response(500)
+    return jsonify(user.to_dict()), 200

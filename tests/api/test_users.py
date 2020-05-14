@@ -121,3 +121,10 @@ def test_get_user(app, mock_model_methods):
     user = response.get_json()
     assert user is not None
     assert user["id"] == _USER_ID
+
+
+@pytest.mark.api
+def test_modify_users(app, mock_model_methods):
+    response = app.patch(f"/api/v0/users/{_USER_ID}", json={"name": "New name"})
+
+    assert response.status_code == 200
