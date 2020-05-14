@@ -52,6 +52,10 @@ class User:
             }
         )
 
+    @classmethod
+    def find_by_id(cls, id_: str) -> Optional["User"]:
+        return cls.get_all().get(id_)
+
     @staticmethod
     def _convert_to_custom_dict(user: "User") -> Dict:
         """Convert dataclass to json serializable dict.

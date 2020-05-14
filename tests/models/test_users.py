@@ -88,3 +88,8 @@ def test_create_user_save(app):
     users = User.get_all()
     assert users[user.id] == user
     assert len(users) == 11
+
+
+def test_find_id(app):
+    assert User.find_by_id(_PROJECT_ID) is None
+    assert User.find_by_id(_EXISTING_USER_ID) is not None
