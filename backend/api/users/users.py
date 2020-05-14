@@ -3,7 +3,8 @@ from flask import jsonify
 
 from backend.api import bp
 from backend.api.errors import error_response
-from backend.api.util import check_requested_data, check_required_keys
+from backend.api.util import check_requested_data, check_required_keys, check_item_exists
+
 from backend.models.users import User
 
 
@@ -22,6 +23,9 @@ def create_user(data: Dict):
 
     return jsonify(user.to_dict()), 201
 
-        return error_response(500)
 
-    return jsonify(project.to_dict()), 201
+@bp.route("/users/<string:item_id>", methods=["GET"])
+@check_item_exists(User, "Required user is missing")
+def get_user(user: User):
+    return jsonify(user.to_dict()), 200
+

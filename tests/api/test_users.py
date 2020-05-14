@@ -1,7 +1,30 @@
 import pytest
+from backend.models import util
 from backend.models.users import User
 
+
+_USER_ID = "123456abcdefghijklmnopqrstuvwxyz"[::-1] * 2
 _PROJECT_ID = "123456abcdefghijklmnopqrstuvwxyz" * 2
+
+
+def get_demo_user(*args, **kwargs):
+    return User(
+        _USER_ID,
+        "Tester>",
+        "test@&12345",
+        "tester@gmail.com",
+        util.hash_password("password"),
+        _PROJECT_ID,
+        type=5,
+    )
+
+
+@pytest.fixture
+def mock_model_methods(monkeypatch):
+    for prop in ["find_by_id", "modify", "delete"]:
+        monkeypatch.setattr(User, prop, get_demo_user)
+
+
 @pytest.mark.api
 def test_users_get(app):
     response = app.get("/api/v0/users")
@@ -89,3 +112,12 @@ def test_create_user_failed(data, expected, app, mock_model_save):
     error = response.get_json()
     assert error["message"] == expected
 
+
+@pytest.mark.api
+def test_get_user(app, mock_model_methods):
+    response = app.get(f"/api/v0/users/{_USER_ID}")
+
+    assert response.status_code == 200
+    user = response.get_json()
+    assert user is not None
+    assert user["id"] == _USER_ID
