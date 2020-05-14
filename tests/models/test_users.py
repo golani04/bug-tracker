@@ -93,3 +93,13 @@ def test_create_user_save(app):
 def test_find_id(app):
     assert User.find_by_id(_PROJECT_ID) is None
     assert User.find_by_id(_EXISTING_USER_ID) is not None
+
+
+def test_delete_user(app):
+    user = User.find_by_id(_EXISTING_USER_ID)
+    assert len(User.get_all()) == 10
+
+    deleted_user = user.delete()
+    user.save("delete")
+    assert deleted_user.id == user.id
+    assert len(User.get_all()) == 9
