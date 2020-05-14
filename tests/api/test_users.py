@@ -25,6 +25,11 @@ def mock_model_methods(monkeypatch):
         monkeypatch.setattr(User, prop, get_demo_user)
 
 
+@pytest.fixture
+def mock_model_save(monkeypatch):
+    monkeypatch.setattr(User, "save", lambda *_: False)
+
+
 @pytest.mark.api
 def test_users_get(app):
     response = app.get("/api/v0/users")
@@ -134,3 +139,52 @@ def test_modify_users(app, mock_model_methods):
 def test_user_delete(app, mock_model_methods):
     response = app.delete(f"/api/v0/users/{_USER_ID}")
     assert response.status_code == 204
+
+
+@pytest.mark.api
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        ("patch", (f"/api/v0/users/{_USER_ID}",), {"json": {"name": "404 Test"}}),
+        ("get", (f"/api/v0/users/{_USER_ID}",), {}),
+        ("delete", (f"/api/v0/users/{_USER_ID}",), {}),
+    ],
+)
+def test_project_404(action, args, kwargs, app, monkeypatch):
+    monkeypatch.setattr(User, "find_by_id", lambda *_: None)
+    actions = {"patch": app.patch, "delete": app.delete, "get": app.get}
+    response = actions[action](*args, **kwargs)
+
+    assert response.status_code == 404
+    assert response.get_json()["message"] == "Required user is missing"
+
+
+@pytest.mark.api
+@pytest.mark.parametrize(
+    "action,args,kwargs",
+    [
+        (
+            "post",
+            (f"/api/v0/users",),
+            {
+                "json": {
+                    "name": "Test",
+                    "username": "tester",
+                    "email": "tester@gmail.com",
+                    "password": "password",
+                    "project": _PROJECT_ID,
+                    "type": 5,
+                }
+            },
+        ),
+        ("patch", (f"/api/v0/users/{_USER_ID}",), {"json": {"name": "Test a user updates"}}),
+        ("delete", (f"/api/v0/users/{_USER_ID}",), {}),
+    ],
+)
+def test_project_500(action, args, kwargs, app, mock_model_methods, mock_model_save):
+    # an error produce by the database
+    actions = {"patch": app.patch, "delete": app.delete, "post": app.post}
+    response = actions[action](*args, **kwargs)
+
+    assert response.status_code == 500
+    assert response.get_json()["message"] == "Internal Server Error"
