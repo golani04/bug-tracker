@@ -9,7 +9,7 @@ _data = [
         "links": "http://statcounter.com/a/nibh.js",
         "severity": 2,
         "status": 1,
-        "created": "2019-05-24",
+        "created_at": "2019-05-24",
         "project": "30cc2f6316740df6032291c60e61ae5b580f3857adf74de5ef78f34e237b11c0",
     },
     {
@@ -21,7 +21,7 @@ _data = [
         "links": None,
         "severity": 3,
         "status": 2,
-        "created": "2019-05-23",
+        "created_at": "2019-05-23",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -33,7 +33,7 @@ _data = [
         "links": "https://amazon.co.jp/ultrices/erat/tortor/sollicitudin.js",
         "severity": 2,
         "status": 2,
-        "created": "2019-09-22",
+        "created_at": "2019-09-22",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -45,7 +45,7 @@ _data = [
         "links": "http://forbes.com/eget/vulputate/ut/ultrices/vel/augue/vestibulum.jsp",
         "severity": 1,
         "status": 3,
-        "created": "2020-01-26",
+        "created_at": "2020-01-26",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -57,7 +57,7 @@ _data = [
         "links": "https://hc360.com/iaculis/congue/vivamus/metus/arcu/adipiscing/molestie.jsp",
         "severity": 1,
         "status": 3,
-        "created": "2019-10-28",
+        "created_at": "2019-10-28",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -69,7 +69,7 @@ _data = [
         "links": "http://globo.com/natoque/penatibus/et.png",
         "severity": 3,
         "status": 2,
-        "created": "2019-05-17",
+        "created_at": "2019-05-17",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -81,7 +81,7 @@ _data = [
         "links": "https://cnn.com/convallis/morbi.jpg",
         "severity": 2,
         "status": 2,
-        "created": "2019-04-25",
+        "created_at": "2019-04-25",
         "project": "30cc2f6316740df6032291c60e61ae5b580f3857adf74de5ef78f34e237b11c0",
     },
     {
@@ -93,7 +93,7 @@ _data = [
         "links": "https://bloglines.com/sed/interdum/venenatis/turpis.aspx",
         "severity": 1,
         "status": 1,
-        "created": "2020-02-03",
+        "created_at": "2020-02-03",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -105,7 +105,7 @@ _data = [
         "links": None,
         "severity": 1,
         "status": 2,
-        "created": "2019-07-09",
+        "created_at": "2019-07-09",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -117,7 +117,7 @@ _data = [
         "links": "http://uiuc.edu/morbi/sem/mauris/laoreet/ut/rhoncus.jpg",
         "severity": 1,
         "status": 3,
-        "created": "2019-08-16",
+        "created_at": "2019-08-16",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -129,7 +129,7 @@ _data = [
         "links": None,
         "severity": 2,
         "status": 1,
-        "created": "2019-10-01",
+        "created_at": "2019-10-01",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -141,7 +141,7 @@ _data = [
         "links": None,
         "severity": 3,
         "status": 3,
-        "created": "2020-03-07",
+        "created_at": "2020-03-07",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -153,7 +153,7 @@ _data = [
         "links": None,
         "severity": 2,
         "status": 1,
-        "created": "2020-01-15",
+        "created_at": "2020-01-15",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -165,7 +165,7 @@ _data = [
         "links": "https://t.co/duis/bibendum/morbi/non/quam/nec.jsp",
         "severity": 2,
         "status": 3,
-        "created": "2019-04-03",
+        "created_at": "2019-04-03",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -177,7 +177,7 @@ _data = [
         "links": "https://wsj.com/convallis/duis/consequat/dui/nec/nisi/volutpat.xml",
         "severity": 3,
         "status": 1,
-        "created": "2019-04-24",
+        "created_at": "2019-04-24",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -189,7 +189,7 @@ _data = [
         "links": None,
         "severity": 2,
         "status": 1,
-        "created": "2020-01-01",
+        "created_at": "2020-01-01",
         "project": "30cc2f6316740df6032291c60e61ae5b580f3857adf74de5ef78f34e237b11c0",
     },
     {
@@ -201,7 +201,7 @@ _data = [
         "links": "http://is.gd/mauris/eget.html",
         "severity": 1,
         "status": 1,
-        "created": "2020-03-01",
+        "created_at": "2020-03-01",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -213,7 +213,7 @@ _data = [
         "links": "http://parallels.com/molestie/lorem/quisque/ut/erat.aspx",
         "severity": 2,
         "status": 2,
-        "created": "2019-10-17",
+        "created_at": "2019-10-17",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -225,7 +225,7 @@ _data = [
         "links": "https://reuters.com/sociis.jpg",
         "severity": 3,
         "status": 1,
-        "created": "2020-02-19",
+        "created_at": "2020-02-19",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -237,7 +237,7 @@ _data = [
         "links": "http://yellowpages.com/id.png",
         "severity": 1,
         "status": 3,
-        "created": "2020-01-11",
+        "created_at": "2020-01-11",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -249,7 +249,7 @@ _data = [
         "links": "https://sciencedirect.com/lorem/vitae/mattis/nibh/ligula/nec.jsp",
         "severity": 3,
         "status": 2,
-        "created": "2019-07-30",
+        "created_at": "2019-07-30",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -261,7 +261,7 @@ _data = [
         "links": None,
         "severity": 2,
         "status": 2,
-        "created": "2020-03-20",
+        "created_at": "2020-03-20",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -273,7 +273,7 @@ _data = [
         "links": "http://nba.com/tempus/vivamus/in.png",
         "severity": 2,
         "status": 1,
-        "created": "2019-06-11",
+        "created_at": "2019-06-11",
         "project": "218116e27cd7ffb160028c8e9c661ce6f880a69419239d524118244082fdafdb",
     },
     {
@@ -285,7 +285,7 @@ _data = [
         "links": "http://washington.edu/quam/sapien/varius/ut/blandit.json",
         "severity": 2,
         "status": 1,
-        "created": "2019-12-07",
+        "created_at": "2019-12-07",
         "project": "c0e898915bd4f2c0fed3cf657609ce2e5ea885d2fbcf923393352962488b008c",
     },
     {
@@ -297,7 +297,7 @@ _data = [
         "links": None,
         "severity": 3,
         "status": 1,
-        "created": "2020-02-07",
+        "created_at": "2020-02-07",
         "project": "44eaefbbb1bdd9e33444de8ffeb1ebf15edce96113bb14a2d296de9e501e7038",
     },
     {
@@ -309,7 +309,7 @@ _data = [
         "links": "http://goo.gl/quam/turpis/adipiscing/lorem/vitae/mattis/nibh.jsp",
         "severity": 1,
         "status": 2,
-        "created": "2019-07-02",
+        "created_at": "2019-07-02",
         "project": "44eaefbbb1bdd9e33444de8ffeb1ebf15edce96113bb14a2d296de9e501e7038",
     },
     {
@@ -321,7 +321,7 @@ _data = [
         "links": "http://marketwatch.com/vestibulum/ante/ipsum.html",
         "severity": 2,
         "status": 1,
-        "created": "2019-12-06",
+        "created_at": "2019-12-06",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -333,7 +333,7 @@ _data = [
         "links": "http://taobao.com/lectus/in.html",
         "severity": 3,
         "status": 2,
-        "created": "2020-03-16",
+        "created_at": "2020-03-16",
         "project": "30cc2f6316740df6032291c60e61ae5b580f3857adf74de5ef78f34e237b11c0",
     },
     {
@@ -345,7 +345,7 @@ _data = [
         "links": "http://meetup.com/curabitur/convallis/duis/consequat/dui/nec.aspx",
         "severity": 1,
         "status": 3,
-        "created": "2020-01-26",
+        "created_at": "2020-01-26",
         "project": "948d5675ef53818b6ad6b581582afd66884ca61b31230363a827bc35211e0433",
     },
     {
@@ -357,7 +357,7 @@ _data = [
         "links": "https://hibu.com/in/purus/eu/magna/vulputate/luctus.jpg",
         "severity": 3,
         "status": 1,
-        "created": "2019-04-23",
+        "created_at": "2019-04-23",
         "project": "44eaefbbb1bdd9e33444de8ffeb1ebf15edce96113bb14a2d296de9e501e7038",
     },
 ]

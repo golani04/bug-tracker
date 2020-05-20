@@ -12,7 +12,7 @@ def test_issue_get_all(app):
     assert res.status_code == 200
 
     data = res.get_json()
-    assert set(data[0]) > {"id", "title", "created", "description", "assignee"}
+    assert set(data[0]) > {"id", "title", "created_at", "description", "assignee"}
 
 
 @pytest.mark.api
