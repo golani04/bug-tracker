@@ -82,7 +82,7 @@ def test_issue_create(app):
 
     assert issue is not None
     assert issue.assignee == _MAINTAINER_ID
-    assert issue.created == date(2020, 1, 1)
+    assert issue.created_at == date(2020, 1, 1)
     assert issue.time_spent == timedelta(**{"days": 1, "hours": 11}).total_seconds()
 
     _ID = issue.id
@@ -141,14 +141,14 @@ def test_issue_modify_unchangeable_keys(app):
         "id": _ISSUE_ID,
         "reporter": _MAINTAINER_ID,
         "project": _PROJECT_ID,
-        "created": "2020-04-29",
+        "created_at": "2020-04-29",
     }
     issue = issue.modify(data)
     # then
     assert issue.id != _ISSUE_ID
     assert issue.reporter != _MAINTAINER_ID
     assert issue.project != _PROJECT_ID
-    assert issue.created != data["created"]
+    assert issue.created_at != data["created_at"]
 
 
 def test_issue_modify_saved(app):

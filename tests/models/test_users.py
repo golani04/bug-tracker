@@ -24,7 +24,7 @@ def test_user_class():
     assert user.type == UserType(5)
     assert user.name == "Tester&gt;"
     assert user.username == "test@&amp;12345"
-    assert user.created == date(2020, 1, 1)
+    assert user.created_at == date(2020, 1, 1)
     assert user.password != "password"
     assert util.verify_password("password", user.password)
 
@@ -56,7 +56,7 @@ def test_create_user():
     user = User.create(
         {
             "id": _USER_ID,
-            "created": "2019-10-10",
+            "created_at": "2019-10-10",
             "name": "Test create",
             "username": "test@create",
             "email": "test@test.com",
@@ -68,7 +68,7 @@ def test_create_user():
 
     assert user.id is not None
     assert user.id != _USER_ID
-    assert user.created == date(2020, 1, 1)
+    assert user.created_at == date(2020, 1, 1)
     assert user.type == UserType.developer
 
 
@@ -76,7 +76,7 @@ def test_create_user_save(app):
     user = User.create(
         {
             "id": _USER_ID,
-            "created": "2019-10-10",
+            "created_at": "2019-10-10",
             "name": "Test create",
             "username": "test@create",
             "email": "test@test.com",
@@ -118,7 +118,7 @@ def test_delete_user(app):
         # unchangeable keys
         ("id", _USER_ID, _EXISTING_USER_ID),
         ("project", _PROJECT_ID, _EXISTING_PROJECT_ID),
-        ("created", "2019-10-10", date(2020, 1, 1)),
+        ("created_at", "2019-10-10", date(2020, 1, 1)),
     ],
 )
 def test_modify_user(app, prop, val, expected):

@@ -36,7 +36,7 @@ def test_users_get(app):
     assert response.status_code == 200
 
     json = response.get_json()
-    assert set(json[0]) >= {"name", "id", "password", "username", "created", "email", "type"}
+    assert set(json[0]) >= {"name", "id", "password", "username", "created_at", "email", "type"}
 
 
 @pytest.mark.api

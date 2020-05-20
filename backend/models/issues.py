@@ -1,12 +1,13 @@
-from dataclasses import asdict, dataclass, field, replace
-from datetime import date, timedelta
+from dataclasses import asdict, dataclass, field
+from datetime import date, datetime, timedelta
 from enum import Enum
 from functools import lru_cache
-from typing import Any, ClassVar, Dict, List, Optional, Set
+from typing import Any, ClassVar, Dict, List, Set
 
 from flask import escape
 from backend import database as db
 from backend.models import util, validate
+from backend.models.base import Base
 
 
 Severity = Enum("Severity", "low medium high")
@@ -15,7 +16,7 @@ Label = Enum("Label", "bug enhancement duplicate wontfix")
 
 
 @dataclass
-class Issue:
+class Issue(Base):
     id: str
     title: str = field(compare=False, metadata="Describe an issue in short.")
     reporter: str = field(compare=False)  # FK
@@ -27,14 +28,15 @@ class Issue:
     description: str = field(
         default="", compare=False, repr=False, metadata="Explain the bug with examples.",
     )
-    created: date = field(default_factory=date.today, repr=False)
+    created_at: date = field(default_factory=date.today, repr=False)
+    updated_at: datetime = field(default=None, repr=False)
     due: date = field(default=None, repr=False)
     time_spent: int = field(default=0, repr=False)
     comments: List[str] = field(default_factory=list, repr=False)
     links: List[str] = field(default_factory=list, repr=False)
     # TODO: images: List[str] = field(default_factory=list)
     # define class variable
-    unchangeable_props: ClassVar[Set] = {"id", "created", "project", "reporter"}
+    unchangeable_props: ClassVar[Set] = {"id", "created_at", "project", "reporter"}
     # TODO: insure that this set is needed
     required_props: ClassVar[Set] = {"assignee", "title", "project", "reporter"}
     # if id provided other properties are irrelevant
@@ -61,8 +63,11 @@ class Issue:
         validate.is_enum_has_prop(Status, self.status)
         validate.is_enum_has_prop(Label, self.label)
         validate.is_time_dict(self.time_spent)
-        validate.is_date(self.created)
-        self.due and validate.is_date(self.due)  # allowed to be None
+        validate.is_date(self.created_at)
+        # allowed to be None
+        self.updated_at and validate.is_datetime(self.updated_at)
+        self.due and validate.is_date(self.due)
+        # /allowed to be None
         # transform props to required formats
         # convert unallowed signs to html codes
         self.title = escape(self.title)
@@ -74,7 +79,8 @@ class Issue:
         # timedelta seconds to timedelta
         self.time_spent = util.wdhms_to_seconds(self.time_spent)
         # convert str to dates
-        self.created = util.set_date(self.created)
+        self.created_at = util.set_date(self.created_at)
+        self.updated_at = util.set_datetime(self.updated_at, allowed_none=True)
         self.due = util.set_date(self.due, allowed_none=True)
 
     @classmethod
@@ -101,18 +107,6 @@ class Issue:
             return val
 
         return {k: serialize_values(v) for k, v in asdict(issue).items()}
-
-    def to_dict(self) -> Dict:
-        return self._convert_to_custom_dict(self)
-
-    @classmethod
-    def create(cls, new_issue: Dict) -> "Issue":
-        new_issue = {**new_issue, "id": util.create_id(), "created": date.today()}
-        return cls(**new_issue)
-
-    @classmethod
-    def find_by_id(cls, id_: str) -> Optional["Issue"]:
-        return cls.get_all().get(id_)
 
     @classmethod
     def search(cls, props: Dict) -> List["Issue"]:
@@ -141,13 +135,6 @@ class Issue:
             for issue in cls.get_all().values()
             if all(getattr(issue, k, None) == v for k, v in props.items())
         ]
-
-    def delete(self) -> "Issue":
-        return self.get_all().pop(self.id)
-
-    def modify(self, data: Dict) -> "Issue":
-        filterd_data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
-        return replace(self, **filterd_data)
 
     def save(self, state: str) -> bool:
         issues = self.get_all()

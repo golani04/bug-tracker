@@ -17,12 +17,12 @@ def test_project():
     # GIVEN
     project = Project(_PROJECT_ID, "test", _MAINTAINER_ID, "Testing a project")
     # WHEN
-    # set `updated` manually, `freezegun` didn't work on `datetime.utcnow`
+    # set `updated_at` manually, `freezegun` failed on `datetime.utcnow`
     # this assignment will set value to the value provided in decorator `@freeze_time`
-    project.updated = datetime.utcnow()
+    project.updated_at = datetime.utcnow()
     # THEN
-    assert project.created == date.today() == date(2020, 1, 1)
-    assert project.updated == datetime(2020, 1, 1, 12, 1, 1, 123456)
+    assert project.created_at == date.today() == date(2020, 1, 1)
+    assert project.updated_at == datetime(2020, 1, 1, 12, 1, 1, 123456)
     assert project.id == _PROJECT_ID
     assert project.favorite is False  # default
 
@@ -58,12 +58,15 @@ def test_that_cached_cleared(app):
     cache_info = get_projects.cache_info
     # WHEN
     get_projects()
+    # second time in order to test that function takes data from cache
     get_projects()
     info = cache_info()
     # THEN
     assert info.hits > 0
     # WHEN
-    project = Project.create("Test project", _MAINTAINER_ID, "First create")
+    project = Project.create(
+        {"name": "Test project", "maintainer": _MAINTAINER_ID, "description": "First create"}
+    )
     project.save("create")
     info = cache_info()
     # THEN
@@ -72,17 +75,21 @@ def test_that_cached_cleared(app):
 
 @freeze_time("2020-1-1")
 def test_create_project():
-    project = Project.create("Test project", _MAINTAINER_ID, "First create")
+    project = Project.create(
+        {"name": "Test project", "maintainer": _MAINTAINER_ID, "description": "First create"}
+    )
 
     assert isinstance(project, Project)
-    assert project.created == date(2020, 1, 1)
+    assert project.created_at == date(2020, 1, 1)
     assert project.maintainer == _MAINTAINER_ID
     assert project.favorite is False
 
 
 def test_maintainer_id_invalid():
     with pytest.raises(ValidationError):
-        Project.create("Test project", "_MAINTAINER_ID", "First create")
+        Project.create(
+            {"name": "Test project", "maintainer": "not_a_valid_id", "description": "First create"}
+        )
 
 
 def test_project_save(app):
@@ -128,7 +135,7 @@ def test_modify_project(app):
     assert prev_name != updated_project.name
     assert prev_description == "Testing a project"
     assert prev_description != updated_project.description
-    assert updated_project.updated == datetime(2020, 1, 1, 12, 0, 0, 123400)
+    assert updated_project.updated_at == datetime(2020, 1, 1, 12, 0, 0, 123400)
 
 
 def test_modify_project_id_is_not_changed(app):

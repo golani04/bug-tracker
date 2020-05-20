@@ -1,8 +1,8 @@
 # Bug tracker
 
-> This project created to help me learn new technologies and give some expirience. This project can include a lot of different technologies: data virtuliazation, autorization, front end, back end, devops.
+> This project is for learning new technologies and get some hands-on experience.
 
-Project's todos graph [trello](https://trello.com/b/sIgFvLWc/bug-tracker).
+[Trello cards](https://trello.com/b/sIgFvLWc/bug-tracker).
 
 ## Possible stack
 
@@ -20,7 +20,8 @@ Back end:
   - Flask
 - Pytest
 - Poetry
-- Micro Services
+- Microservices
+- `TODO`: integrate [pydantic](https://pydantic-docs.helpmanual.io/). Data validation library.
 
 DevOps:
 
@@ -32,5 +33,5 @@ Database:
 
 - Filesystem
 - SQLite
-- Postgres
+- PostgreSQL
 - Redis

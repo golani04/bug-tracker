@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from functools import lru_cache
 from typing import ClassVar, Dict, List, Set, Optional
@@ -6,11 +6,12 @@ from typing import ClassVar, Dict, List, Set, Optional
 from flask import escape
 from backend import database as db
 from backend.models import validate, util
+from backend.models.base import Base
 from backend.models.issues import Issue
 
 
 @dataclass
-class Project:
+class Project(Base):
     id: str
     name: str = field(compare=False, metadata="Give your project a name.")
     maintainer: str = field(compare=False)
@@ -21,44 +22,47 @@ class Project:
         compare=False,
     )
     favorite: bool = field(default=False, metadata="Give a project preference.")
-    created: date = field(default_factory=date.today, repr=False)
-    updated: datetime = field(default_factory=datetime.utcnow, repr=False)
-    # TODO: access - private, public, limited
-    # FK, that collect all items that is connected to project
-    tags: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
+    created_at: date = field(default_factory=date.today, repr=False)
+    updated_at: datetime = field(default_factory=datetime.utcnow, repr=False)
+    # FK, collect all items that is connected to project
     users: List[str] = field(default_factory=list, repr=False, init=False, compare=False)
     issues: Set[str] = field(default_factory=set, repr=False, compare=False)
     # define class variable
-    unchangeable_props: ClassVar[Set] = {"id", "created", "updated"}
+    unchangeable_props: ClassVar[Set] = {"id", "created_at", "updated_at"}
 
     def __post_init__(self):
         validate.item_id(self.id)
         validate.item_id(self.maintainer)
-        validate.is_date(self.created)
-        validate.is_datetime(self.updated)
+        validate.is_date(self.created_at)
+        validate.is_datetime(self.updated_at)
         # convert unallowed signs to html codes
         self.name = escape(self.name)
         self.description = escape(self.description)
         # least needed property, don't raise ValidationError, assign default value
         self.favorite = self.favorite if isinstance(self.favorite, bool) else False
         # convert str to date[time] formats
-        self.created = util.set_date(self.created, date)
-        self.updated = util.set_datetime(self.updated)
+        self.created_at = util.set_date(self.created_at)
+        self.updated_at = util.set_datetime(self.updated_at)
 
-    @classmethod
-    def create(
-        cls, name: str, maintainer: str, description: str = "", favorite: bool = False
-    ) -> "Project":
-        return cls(util.create_id(), name, maintainer, description, favorite)
+    @staticmethod
+    def _convert_to_custom_dict(project: "Project") -> Dict:
+        """Convert dataclass to json serializable dict.
+           Exclude fields that should not be stored, and convert the
+           complex types to the type that can be JSON serializable.
+        """
+        _json_not_serializable_types = (datetime, date)
+        _excluded_fields = {"tags", "issues", "users"}
+        return {
+            # convert datetime to str
+            k: str(v) if isinstance(v, _json_not_serializable_types) else v
+            for k, v in asdict(project).items()
+            if k not in _excluded_fields
+        }
 
     @classmethod
     @lru_cache(1)
     def get_all(cls) -> List["Project"]:
         return {project["id"]: cls(**project) for project in db.get_projects()}
-
-    @classmethod
-    def find_by_id(cls, id_: str) -> Optional["Project"]:
-        return cls.get_all().get(id_)
 
     def get_issue(self, issue_id: str) -> Optional[Issue]:
         issue = Issue.find_by_id(issue_id)
@@ -83,33 +87,6 @@ class Project:
             self.save("modify")
 
         return project_issues
-
-    @staticmethod
-    def _convert_to_custom_dict(project: "Project") -> Dict:
-        """Convert dataclass to json serializable dict.
-           Exclude fields that should not be stored, and convert the
-           complex types to the type that can be JSON serializable.
-        """
-        _json_not_serializable_types = (datetime, date)
-        _excluded_fields = {"tags", "issues", "users"}
-        return {
-            # convert datetime to str
-            k: str(v) if isinstance(v, _json_not_serializable_types) else v
-            for k, v in asdict(project).items()
-            if k not in _excluded_fields
-        }
-
-    def to_dict(self) -> Dict:
-        return self._convert_to_custom_dict(self)
-
-    def delete(self) -> "Project":
-        return self.get_all().pop(self.id)
-
-    def modify(self, data: Dict) -> "Project":
-        data = {k: v for k, v in data.items() if k not in self.unchangeable_props}
-        data["updated"] = datetime.utcnow()
-        # using `replace` will also invoke post init where the validation runs
-        return replace(self, **data)
 
     def save(self, state: str = None) -> bool:
         projects = self.get_all()
