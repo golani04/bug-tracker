@@ -35,7 +35,7 @@ def test_projects_get(app):
     assert response.status_code == 200
 
     json = response.get_json()
-    assert set(json[0]) >= {"name", "id", "maintainer", "favorite", "created", "updated"}
+    assert set(json[0]) >= {"name", "id", "maintainer", "favorite", "created_at", "updated_at"}
 
 
 @pytest.mark.api

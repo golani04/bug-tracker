@@ -22,7 +22,7 @@ def get_projects():
 @check_requested_data
 @check_required_keys({"name", "maintainer"})
 def create_project(data: Dict):
-    project = Project.create(**data)
+    project = Project.create(data)
     if project.save("create") is False:
         return error_response(500)
 
