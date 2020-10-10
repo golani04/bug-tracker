@@ -15,6 +15,4 @@ def _after_req(response):
     return response
 
 
-from .projects import projects  # noqa
-from .issues import issues  # noqa
-from .users import users  # noqa
+from backend.api import projects, issues, users  # noqa

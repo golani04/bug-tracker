@@ -18,7 +18,7 @@ name = "bug-tracker"
 license = "MIT"
 version = "0.1.0"
 readme = "README.md"
-description = "Track your bugs"
+description = "Bug tracking tool to report found bugs in projects."
 authors = ["Leonid <golani04@gmail.com>"]
 
 [tool.poetry.dependencies]
