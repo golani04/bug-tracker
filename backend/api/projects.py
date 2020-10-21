@@ -1,72 +1,27 @@
-from typing import Dict
-from flask import jsonify
+from backend.models.util import find_item_by_id
+from typing import List
+from uuid import UUID
+from fastapi import APIRouter, HTTPException, status
 
-from backend.api import bp
-from backend.api.errors import error_response, not_found
-from backend.api.util import (
-    check_requested_data,
-    check_required_keys,
-    check_item_exists,
-    filter_unchangeable_keys,
-)
-
+from backend.db import FileDatabase
 from backend.models.projects import Project
 
 
-@bp.route("/projects", methods=["GET"])
+router = APIRouter()
+db = FileDatabase()
+
+
+@router.get("/", response_model=List[Project])
 def get_projects():
-    return jsonify([project.to_dict() for project in Project.get_all().values()]), 200
+    return db.get_projects()
 
 
-@bp.route("/projects", methods=["POST"])
-@check_requested_data
-@check_required_keys({"name", "maintainer"})
-def create_project(data: Dict):
-    project = Project.create(data)
-    if project.save("create") is False:
-        return error_response(500)
+@router.get("/{project_id}", response_model=Project)
+def get_issue(project_id: UUID):
+    project = find_item_by_id(db.get_projects(), project_id)
+    if project is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Required project is missing"
+        )
 
-    return jsonify(project.to_dict()), 201
-
-
-@bp.route("/projects/<string:item_id>", methods=["GET"])
-@check_item_exists(Project, "Required project is missing")
-def get_project(project: Project):
-    return jsonify(project.to_dict()), 200
-
-
-@bp.route("/projects/<string:item_id>/issues/<string:issue_id>", methods=["GET"])
-@check_item_exists(Project, "Required project is missing")
-def get_project_issue(project: Project, issue_id: str):
-    issue = project.get_issue(issue_id)
-    if issue is None:
-        return not_found("Required issue is missing")
-    return jsonify(issue.to_dict()), 200
-
-
-@bp.route("/projects/<string:item_id>/issues", methods=["GET"])
-@check_item_exists(Project, "Required project is missing")
-def get_project_issues(project: Project):
-    return jsonify([issue.to_dict() for issue in project.get_issues()]), 200
-
-
-@bp.route("/projects/<string:item_id>", methods=["PATCH"])
-@check_requested_data
-@filter_unchangeable_keys(Project.unchangeable_props)
-@check_item_exists(Project, "Required project is missing")
-def update_project(project: Project, data: Dict):
-    project = project.modify(data)
-    if project.save("modify") is False:
-        return error_response(500)
-
-    return jsonify(project.to_dict()), 200
-
-
-@bp.route("/projects/<string:item_id>", methods=["DELETE"])
-@check_item_exists(Project, "Required project is missing")
-def delete_project(project: Project):
-    project.delete()
-    if project.save("delete") is False:
-        return error_response(500)
-
-    return jsonify(), 204
+    return project
