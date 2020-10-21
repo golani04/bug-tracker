@@ -1,57 +1,54 @@
-from typing import Dict
-from flask import jsonify
+from backend.models.util import find_item_by_id
+from backend.db import FileDatabase
+from fastapi import APIRouter, status, HTTPException
+from typing import List
 
-from backend.api import bp
-from backend.api.errors import error_response
-from backend.api.util import (
-    check_item_exists,
-    check_requested_data,
-    check_required_keys,
-    filter_unchangeable_keys,
-)
-
-from backend.models.issues import Issue
+from backend.models.issues import Issue, IssueCreate
 
 
-@bp.route("/issues", methods=["GET"])
+router = APIRouter()
+db = FileDatabase()
+
+
+@router.get("/", response_model=List[Issue])
 def get_issues():
-    return jsonify([issue.to_dict() for issue in Issue.get_all().values()]), 200
+    return db.get_issues()
 
 
-@bp.route("/issues", methods=["POST"])
-@check_requested_data
-@check_required_keys(Issue.required_props)
-def create_issue(data: Dict):
-    issue = Issue.create(data)
-    if issue.save("create") is False:
-        return error_response(500)
-
-    return jsonify(issue.to_dict()), 201
+@router.post("/", response_model=Issue, status_code=status.HTTP_201_CREATED)
+def create_issue(data: IssueCreate):
+    issue = IssueCreate(data)
+    return issue
 
 
-@bp.route("/issues/<string:item_id>", methods=["GET"])
-@check_item_exists(Issue, "Required issue is missing")
-def get_issue(issue: Issue):
-    return jsonify(issue.to_dict()), 200
+@router.get("/{issue_id}", response_model=Issue)
+def get_issue(issue_id: int):
+    issue = find_item_by_id(db.get_issues(), issue_id)
+    if issue is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Required issue is missing"
+        )
+
+    return issue
 
 
-@bp.route("/issues/<string:item_id>", methods=["PATCH"])
-@check_requested_data
-@filter_unchangeable_keys(Issue.unchangeable_props)
-@check_item_exists(Issue, "Required issue is missing")
-def update_issue(issue: Issue, data: Dict):
-    issue = Issue.modify(data)
-    if issue.save("modify") is False:
-        return error_response(500)
+# @router.route("/issues/<string:item_id>", methods=["PATCH"])
+# @check_requested_data
+# @filter_unchangeable_keys(Issue.unchangeable_props)
+# @check_item_exists(Issue, "Required issue is missing")
+# def update_issue(issue: Issue, data: Dict):
+#     issue = Issue.modify(data)
+#     if issue.save("modify") is False:
+#         return error_response(500)
 
-    return jsonify(issue.to_dict()), 200
+#     return jsonify(issue.to_dict()), 200
 
 
-@bp.route("/issues/<string:item_id>", methods=["DELETE"])
-@check_item_exists(Issue, "Required issue is missing")
-def delete_issue(issue: Issue):
-    issue.delete()
-    if issue.save("delete") is False:
-        return error_response(500)
+# @router.route("/issues/<string:item_id>", methods=["DELETE"])
+# @check_item_exists(Issue, "Required issue is missing")
+# def delete_issue(issue: Issue):
+#     issue.delete()
+#     if issue.save("delete") is False:
+#         return error_response(500)
 
-    return jsonify(), 204
+#     return jsonify(), 204

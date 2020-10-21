@@ -1,18 +1,11 @@
-from flask import Blueprint
-
-bp = Blueprint("api", __name__)
-
-
-@bp.before_request
-def _before_req():
-    """Load current user"""
+from fastapi import APIRouter
+from backend.api.issues import router as issue_router
+from backend.api.users import router as user_router
+from backend.api.projects import router as project_router
 
 
-@bp.after_request
-def _after_req(response):
-    """Update user activity timeout."""
+api_router = APIRouter()
 
-    return response
-
-
-from backend.api import projects, issues, users  # noqa
+api_router.include_router(issue_router, tags=["Issues"], prefix="/issues")
+api_router.include_router(user_router, tags=["Users"], prefix="/users")
+api_router.include_router(project_router, tags=["Projects"], prefix="/projects")
