@@ -1,10 +1,12 @@
 import json
-from dataclasses import dataclass, field
 from typing import Dict, List
+
+from backend.config import settings
 
 
 def _read_json(path: str) -> List[Dict]:
     try:
+        settings.logger.info(f"Path to json: {path}")
         with open(path, mode="r") as f:
             return json.loads(f.read())
     except IOError:
@@ -20,24 +22,27 @@ def _save_json(path: str, data: List) -> bool:
         return False
 
 
-@dataclass
-class DB:
-    config: object = field(default_factory=object)
+class FileDatabase:
+    @staticmethod
+    def get_projects() -> List[Dict]:
+        return _read_json(settings.projects_path)
 
-    def get_projects(self) -> List[Dict]:
-        return _read_json(self.config.PROJECTS_PATH)
+    @staticmethod
+    def save_projects(projects: List[Dict]) -> bool:
+        return _save_json(settings.projects_path, projects)
 
-    def save_projects(self, projects: List[Dict]) -> bool:
-        return _save_json(self.config.PROJECTS_PATH, projects)
+    @staticmethod
+    def get_issues() -> List[Dict]:
+        return _read_json(settings.issues_path)
 
-    def get_issues(self) -> List[Dict]:
-        return _read_json(self.config.ISSUES_PATH)
+    @staticmethod
+    def save_issues(issues: List[Dict]) -> bool:
+        return _save_json(settings.issues_path, issues)
 
-    def save_issues(self, issues: List[Dict]) -> bool:
-        return _save_json(self.config.ISSUES_PATH, issues)
+    @staticmethod
+    def get_users() -> List[Dict]:
+        return _read_json(settings.users_path)
 
-    def get_users(self) -> List[Dict]:
-        return _read_json(self.config.USERS_PATH)
-
-    def save_users(self, users: List[Dict]) -> bool:
-        return _save_json(self.config.USERS_PATH, users)
+    @staticmethod
+    def save_users(users: List[Dict]) -> bool:
+        return _save_json(settings.users_path, users)
