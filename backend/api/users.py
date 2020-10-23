@@ -4,8 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 
 from backend.db import FileDatabase
-from backend.models.users import User
-from backend.models.util import find_item_by_id
+from backend.schemas.users import User
+from backend.schemas.util import find_item_by_id
 
 router = APIRouter()
 db = FileDatabase()
@@ -14,17 +14,6 @@ db = FileDatabase()
 @router.get("/", response_model=List[User])
 def get_users():
     return db.get_users()
-
-
-# @bp.route("/users", methods=["POST"])
-# @check_requested_data
-# @check_required_keys({"name", "username", "email", "password", "project"})
-# def create_user(data: Dict):
-#     user = User.create(data)
-#     if user.save("create") is False:
-#         return error_response(500)
-
-#     return jsonify(user.to_dict()), 201
 
 
 @router.get("/{user_id}", response_model=User)

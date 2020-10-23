@@ -1,10 +1,10 @@
-from backend.models.util import find_item_by_id
+from backend.schemas.util import find_item_by_id
 from typing import List
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 
 from backend.db import FileDatabase
-from backend.models.projects import Project
+from backend.schemas.projects import Project
 
 
 router = APIRouter()
