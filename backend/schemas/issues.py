@@ -5,11 +5,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from backend.models.comment import Comment
+from backend.schemas.comment import Comment
 
 
 Severity = Enum("Severity", "low medium high")
-Status = Enum("Status", "open done review close")
+Status = Enum("Status", "opened development review completed")
 Label = Enum("Label", "bug enhancement duplicate wontfix")
 
 
@@ -25,7 +25,7 @@ class IssueBase(BaseModel):
         description=f"Severity level of the issue: {', '.join(severity.name for severity in Severity)}.",  # noqa E501
     )
     status: Status = Field(
-        Status.open,
+        Status.opened,
         description=f"Current status of the issue: {', '.join(status.name for status in Status)}",
     )
     label: Label = Field(
