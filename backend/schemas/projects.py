@@ -26,7 +26,8 @@ class Project(ProjectBase):
 
 
 # due to circular imports
-from backend.models.issues import Issue  # noqa: E402
-from backend.models.users import User  # noqa: E402
+from backend.schemas.issues import Issue  # noqa: E402
+from backend.schemas.users import User  # noqa: E402
 
+# in order to use refs in type declaration
 Project.update_forward_refs()
