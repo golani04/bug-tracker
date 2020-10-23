@@ -1,9 +1,9 @@
-from backend.models.util import find_item_by_id
+from backend.schemas.util import find_item_by_id
 from backend.db import FileDatabase
 from fastapi import APIRouter, status, HTTPException
 from typing import List
 
-from backend.models.issues import Issue, IssueCreate
+from backend.schemas.issues import Issue, IssueCreate
 
 
 router = APIRouter()
