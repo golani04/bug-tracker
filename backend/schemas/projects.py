@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -18,7 +18,7 @@ class ProjectCreate(ProjectBase):
 
 class Project(ProjectBase):
     id: UUID
-    updated_at: datetime = None
+    updated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     users: List["User"] = []

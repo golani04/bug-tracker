@@ -6,6 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from backend.schemas.comment import Comment
+from backend.schemas.users import User
 
 
 Severity = Enum("Severity", "low medium high")
@@ -14,7 +15,6 @@ Label = Enum("Label", "bug enhancement duplicate wontfix")
 
 
 class IssueBase(BaseModel):
-    assignee: UUID
     reporter: UUID
     project: UUID
     title: str
@@ -42,5 +42,6 @@ class Issue(IssueBase):
     updated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    assignees: List[User] = []
     comments: List[Comment] = []
     # TODO: images, links
