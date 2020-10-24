@@ -1,19 +1,25 @@
 from datetime import datetime
-from enum import Enum
+from enum import IntEnum
 from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
 
-UserType = Enum("UserType", ["reporter", "developer", "manager", "admin"])
+class UserType(IntEnum):
+    admin = 8  # only me
+    manager = 6  # like admin only per organization
+    developer = 4
+    reporter = 2
+    viewer = 1
 
 
 class UserBase(BaseModel):
-    name: str
+    firstname: str
+    lastname: str
     username: str
     email: EmailStr
-    type: UserType = Field(UserType.reporter)
+    type: UserType = Field(UserType.viewer)
 
 
 class UserCreate(UserBase):
@@ -25,11 +31,9 @@ class User(UserBase):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     issues: List["Issue"] = []
-    projects: List["Project"] = []
 
 
 # due to circular imports
 from backend.schemas.issues import Issue  # noqa: E402
-from backend.schemas.projects import Project  # noqa: E402
 
 User.update_forward_refs()

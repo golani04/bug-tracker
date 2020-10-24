@@ -1,12 +1,13 @@
 from datetime import datetime
 from uuid import UUID
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CommentBase(BaseModel):
+    text: str
     commenter: UUID
-    reply_to: Optional[int]
+    reply_to: Optional[int] = Field(None, description="Replying to the previous comment")
 
 
 class CommentCreate(CommentBase):
@@ -15,5 +16,5 @@ class CommentCreate(CommentBase):
 
 class Comment(CommentBase):
     id: int
-    updated_at: datetime
     created_at: datetime
+    updated_at: Optional[datetime] = None
