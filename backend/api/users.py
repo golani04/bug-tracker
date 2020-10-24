@@ -18,7 +18,6 @@ def get_users():
 
 @router.get("/{user_id}", response_model=User)
 def get_issue(user_id: UUID):
-    print(db.get_users())
     user = find_item_by_id(db.get_users(), user_id)
     if user is None:
         raise HTTPException(
