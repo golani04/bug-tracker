@@ -29,7 +29,7 @@ description = "Bug tracking tool to report found bugs in projects."
 authors = ["Leonid <golani04@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 fastapi = "^0.61.1"
 flask = "^1.1.2"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
