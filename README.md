@@ -9,15 +9,17 @@
 Front end:
 
 - React
+- Vue
 - GraphQL
 - Jest
-- D3 or simpler graph library
+- D3
 - Webpack
 
 Back end:
 
 - Python
   - Flask
+  - FastAPI
 - Pytest
 - Poetry
 - Microservices
@@ -26,7 +28,7 @@ Back end:
 DevOps:
 
 - Docker
-  - Kubernets
+- Kubernets
 - AWS
 
 Database:
@@ -35,3 +37,13 @@ Database:
 - SQLite
 - PostgreSQL
 - Redis
+- MongoDB or any other key-value
+
+## Plan
+
+### Project structure
+
+- Organization
+  - Users
+  - Projects
+    - Issues
