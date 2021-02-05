@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
 from backend.schemas.comment import Comment
 from backend.schemas.users import User
@@ -21,16 +21,12 @@ class IssueBase(BaseModel):
     description: str = ""
     due: Optional[datetime] = None
     severity: Severity = Field(
-        Severity.low,
-        description=f"Severity level of the issue: {', '.join(severity.name for severity in Severity)}.",  # noqa E501
+        Severity.low, description=f"Severity levels: {', '.join(s.name for s in Severity)}."
     )
     status: Status = Field(
-        Status.opened,
-        description=f"Current status of the issue: {', '.join(status.name for status in Status)}",
+        Status.opened, description=f"Statuses: {', '.join(s.name for s in Status)}"
     )
-    label: Label = Field(
-        Label.bug, description=f"Type of an issue: {', '.join(label.name for label in Label)}."
-    )
+    label: Label = Field(Label.bug, description=f"Issue types: {', '.join(l.name for l in Label)}.")
 
 
 class IssueCreate(IssueBase):
@@ -39,9 +35,8 @@ class IssueCreate(IssueBase):
 
 class Issue(IssueBase):
     id: int
-    updated_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None  # pylint: disable=unsubscriptable-object
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     assignees: List[User] = []
     comments: List[Comment] = []
-    # TODO: images, links
