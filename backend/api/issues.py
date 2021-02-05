@@ -32,23 +32,3 @@ def get_issue(issue_id: int):
     return issue
 
 
-# @router.route("/issues/<string:item_id>", methods=["PATCH"])
-# @check_requested_data
-# @filter_unchangeable_keys(Issue.unchangeable_props)
-# @check_item_exists(Issue, "Required issue is missing")
-# def update_issue(issue: Issue, data: Dict):
-#     issue = Issue.modify(data)
-#     if issue.save("modify") is False:
-#         return error_response(500)
-
-#     return jsonify(issue.to_dict()), 200
-
-
-# @router.route("/issues/<string:item_id>", methods=["DELETE"])
-# @check_item_exists(Issue, "Required issue is missing")
-# def delete_issue(issue: Issue):
-#     issue.delete()
-#     if issue.save("delete") is False:
-#         return error_response(500)
-
-#     return jsonify(), 204

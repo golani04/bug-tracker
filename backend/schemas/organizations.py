@@ -2,9 +2,10 @@ from enum import Enum
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 from backend.schemas.projects import Project
+from backend.schemas.users import User
 
 
 class License(Enum):
@@ -27,3 +28,4 @@ class Organization(OrganizationBase):
     license: License
 
     projects: List[Project]
+    users: List[User]

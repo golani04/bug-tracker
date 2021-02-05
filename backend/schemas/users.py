@@ -3,15 +3,13 @@ from enum import IntEnum
 from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field  # pylint: disable=no-name-in-module
 
 
 class UserType(IntEnum):
-    admin = 8  # only me
-    manager = 6  # like admin only per organization
+    admin = 0
     developer = 4
-    reporter = 2
-    viewer = 1
+    viewer = 8
 
 
 class UserBase(BaseModel):
@@ -30,10 +28,13 @@ class User(UserBase):
     id: UUID
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    issues: List["Issue"] = []
+    issues: List["Issue"] = Field(default_factory=list)
+    projects: List["Project"] = Field(default_factory=list)
 
 
 # due to circular imports
 from backend.schemas.issues import Issue  # noqa: E402
+from backend.schemas.projects import Project  # noqa: E402
 
+Project.update_forward_refs()
 User.update_forward_refs()
