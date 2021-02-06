@@ -2,6 +2,10 @@
 
 > This project is for learning new technologies and get some hands-on experience.
 
+## Development
+
+Starting dev server run: `poetry run uvicorn main:app --reload`
+
 [Trello cards](https://trello.com/b/sIgFvLWc/bug-tracker).
 
 ## Possible stack
