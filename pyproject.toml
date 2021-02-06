@@ -25,13 +25,12 @@ name = "bug-tracker"
 license = "MIT"
 version = "0.1.0"
 readme = "README.md"
-description = "Bug tracking tool to report found bugs in projects."
+description = "Register issues that occured in the projects."
 authors = ["Leonid <golani04@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.61.1"
-flask = "^1.1.2"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pydantic = {extras = ["dotenv", "email"], version = "^1.6.1"}
 uvicorn = "^0.12.1"
