@@ -1,48 +1,20 @@
-import json
-from typing import Dict, List
+from contextlib import closing
 
-from backend.config import settings
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, sessionmaker
 
-
-def _read_json(path: str) -> List[Dict]:
-    try:
-        settings.logger.info(f"Path to json: {path}")
-        with open(path, mode="r") as f:
-            return json.loads(f.read())
-    except IOError:
-        return []
+from config import settings
 
 
-def _save_json(path: str, data: List) -> bool:
-    try:
-        with open(path, mode="w") as f:
-            f.write(json.dumps(data))
-            return True
-    except IOError:
-        return False
+# connect_args only requires by SQLite database, by default it prevents accessing db from different
+# thread in order to prevent accidental sharing of the same connection
+engine = create_engine(settings.sqlalchemy_database_url, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 
-class FileDatabase:
-    @staticmethod
-    def get_projects() -> List[Dict]:
-        return _read_json(settings.projects_path)
-
-    @staticmethod
-    def save_projects(projects: List[Dict]) -> bool:
-        return _save_json(settings.projects_path, projects)
-
-    @staticmethod
-    def get_issues() -> List[Dict]:
-        return _read_json(settings.issues_path)
-
-    @staticmethod
-    def save_issues(issues: List[Dict]) -> bool:
-        return _save_json(settings.issues_path, issues)
-
-    @staticmethod
-    def get_users() -> List[Dict]:
-        return _read_json(settings.users_path)
-
-    @staticmethod
-    def save_users(users: List[Dict]) -> bool:
-        return _save_json(settings.users_path, users)
+def get_db() -> Session:
+    with closing(SessionLocal()) as db:
+        yield db
