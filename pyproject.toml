@@ -17,6 +17,7 @@ exclude = '''
 force_grid_wrap = 0
 include_trailing_comma = true
 line_length = 100
+lines_after_imports = 2
 multi_line_output = 3
 sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
 
