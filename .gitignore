@@ -1,8 +1,12 @@
+# caching
 __pycache__
 node_modules
+# ignore setup files
 .coverage
 .env
 .vscode
+*.db
+# folders
 db_files
 reports
 logs
