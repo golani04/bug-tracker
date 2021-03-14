@@ -6,7 +6,6 @@ from uuid import UUID
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
 from backend.schemas.comment import Comment
-from backend.schemas.users import User
 
 
 Severity = Enum("Severity", "low medium high")
@@ -35,8 +34,13 @@ class IssueCreate(IssueBase):
 
 class Issue(IssueBase):
     id: int
-    updated_at: Optional[datetime] = None  # pylint: disable=unsubscriptable-object
+    updated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    assignees: List[User] = []
+    assignees: List["User"] = []
     comments: List[Comment] = []
+
+
+from backend.schemas.users import User
+
+Issue.update_forward_refs()
