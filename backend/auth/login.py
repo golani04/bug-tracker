@@ -1,4 +1,4 @@
-import logging
+from dataclasses import dataclass
 
 import pydantic
 from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
@@ -7,18 +7,17 @@ from sqlalchemy.orm import Session
 
 from backend.db import get_db
 from backend.models.users import User
-from backend.schemas.users import UserType
 
 
-router = APIRouter()
-logger = logging.getLogger("bug_tracker")
+@dataclass
+class LoggedInUser:
+    username: str
+    password: str
+
 
 LoggedInUser = pydantic.dataclasses.dataclass(LoggedInUser)
 router = APIRouter()
 
-class LoggedInUser(BaseModel):
-    username: str
-    password: str
 
 @router.post("/login", status_code=status.HTTP_204_NO_CONTENT)
 def login(user: LoggedInUser = Body(...), session: Session = Depends(get_db)):
