@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% set title = 'Login' %}
+
+{% block main %}
+
+<div class="container col-xxl-4 col-lg-6 col-md-12 my-4">
+
+    <form class="row g-3" action="/auth/login" method="post">
+
+        <h3 class="h3 fw-normal">Sign in</h3>
+
+        <div class="col-12">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="username" id="username" placeholder="email or username">
+                <label for="username">Username</label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-floating">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Sign in</button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
