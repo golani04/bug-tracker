@@ -33,8 +33,7 @@ class User(UserBase):
 
 
 # due to circular imports
-from backend.schemas.issues import Issue  # noqa: E402
 from backend.schemas.projects import Project  # noqa: E402
+from backend.schemas.issues import Issue  # noqa: E402
 
-Project.update_forward_refs()
 User.update_forward_refs()
