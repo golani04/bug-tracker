@@ -18,4 +18,4 @@ class Project(Base):
 
     active = Column(Boolean, default=True)
 
-    owner = relationship("User", back_populates="projects")
+    owner = relationship("User", backref="projects")

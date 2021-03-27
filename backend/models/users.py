@@ -18,5 +18,3 @@ class User(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow())
     active = Column(Boolean, default=True)
-
-    projects = relationship("Project", back_populates="user")
