@@ -21,16 +21,3 @@ class User(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow())
     active = Column(Boolean, default=True)
-
-    projects = relationship("Project", back_populates="owner")
-
-    @classmethod
-    def create_user(cls, username: str, password: str, fname: str, lname: str, role: int) -> "User":
-        return cls(
-            username=username,
-            email=username,
-            password=hash_password(password),
-            firstname=fname,
-            lastname=lname,
-            role=role,
-        )
