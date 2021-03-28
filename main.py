@@ -1,9 +1,7 @@
 import os
 
-from fastapi import FastAPI, Request, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from backend.api import routers
 from backend.auth import auth_routers
@@ -12,9 +10,7 @@ from logger import init_logger
 
 
 app = FastAPI(title="Bug Tracker")
-# create logger
-init_logger(os.path.abspath(os.path.join(os.path.curdir, "logs", "bug_tracker.log")))
-
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 # define routers
 app.include_router(routers, prefix="/api/v1")
