@@ -34,7 +34,7 @@ class IssueCreate(IssueBase):
 
 class Issue(IssueBase):
     id: int
-    updated_at: Optional[datetime] = None  # pylint: disable=unsubscriptable-object
+    updated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     assignees: List["User"] = []
@@ -43,5 +43,5 @@ class Issue(IssueBase):
 
 from backend.schemas.users import User
 
-
+                         
 Issue.update_forward_refs()

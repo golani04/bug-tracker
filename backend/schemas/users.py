@@ -17,7 +17,7 @@ class UserBase(BaseModel):
     lastname: str
     username: str
     email: EmailStr
-    type: UserType = Field(UserType.viewer)
+    role: UserType = Field(UserType.viewer)
 
 
 class UserCreate(UserBase):
@@ -35,5 +35,6 @@ class User(UserBase):
 # due to circular imports
 from backend.schemas.projects import Project  # noqa: E402
 from backend.schemas.issues import Issue  # noqa: E402
+
 
 User.update_forward_refs()
