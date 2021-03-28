@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from backend.api import routers
 from backend.auth import auth_routers
@@ -9,7 +10,7 @@ from logger import init_logger
 
 
 app = FastAPI(title="Bug Tracker")
-
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 # define routers
 app.include_router(routers, prefix="/api/v1")
