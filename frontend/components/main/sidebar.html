@@ -1,0 +1,25 @@
+<aside class="sidebar" data-image="./static/images/sidebar-5.jpg">
+    <div class="sidebar-wrapper">
+        <div class="logo">
+            <a href="/" class="simple-text">
+                Bug Tracker
+            </a>
+        </div>
+        <ul class="nav">
+            {% for caption, icon in (('dashboard', 'fa-chart-pie'), ('user', 'fa-user-circle'), ('issues', 'fa-table'),
+            ('notifications', 'fa-bell')) %}
+            {% set active_class = 'active' if caption == current_page else ''%}
+            <li class="nav-item {{ active_class }}">
+                <a class="nav-link" href="./{{ caption }}.html">
+                    <i class="fas {{ icon }}"></i> {{ caption | title}}
+                </a>
+            </li>
+            {% endfor %}
+            <li class="nav-item active active-pro">
+                <a class="nav-link active" data-bs-toggle="modal" data-bs-target="#create-issue-modal" href="#">
+                    <i class="fas fa-anchor"></i> Create Issue
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
