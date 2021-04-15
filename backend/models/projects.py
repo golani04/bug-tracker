@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from backend.db import Base
@@ -19,3 +19,8 @@ class Project(Base):
     active = Column(Boolean, default=True)
 
     owner = relationship("User", backref="projects")
+    issues = relationship("Issue", back_populates="project")
+
+    @classmethod
+    def create(cls, name: str, user_id: int):
+        return cls(name=name, creator_id=user_id)
