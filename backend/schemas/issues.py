@@ -1,31 +1,54 @@
-from datetime import datetime
-from enum import Enum
-from typing import List, Optional
-from uuid import UUID
+from datetime import date, datetime
+from enum import IntEnum, auto
+from typing import Optional
 
 from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
 
-from backend.schemas.comment import Comment
+
+class Helpers(IntEnum):
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def names(cls):
+        return [item.name for item in cls]
+
+    @classmethod
+    def values(cls):
+        return [item.value for item in cls]
 
 
-Severity = Enum("Severity", "low medium high")
-Status = Enum("Status", "opened development review completed")
-Label = Enum("Label", "bug enhancement duplicate wontfix")
+class Severity(Helpers):
+    low = 1
+    medium = auto()
+    high = auto()
+
+
+class Status(Helpers):
+    opened = 1
+    in_progress = auto()
+    in_review = auto()
+    completed = auto()
+
+
+class Label(Helpers):
+    bug = 1
+    enhancement = auto()
+    duplicate = auto()
+    wontfix = auto()
 
 
 class IssueBase(BaseModel):
-    reporter: UUID
-    project: UUID
+    reporter: int
+    project_id: int
     title: str
     description: str = ""
-    due: Optional[datetime] = None
+    due: Optional[date] = None
     severity: Severity = Field(
-        Severity.low, description=f"Severity levels: {', '.join(s.name for s in Severity)}."
+        Severity.low, description=f"Severity levels: {', '.join(Severity.names())}."
     )
-    status: Status = Field(
-        Status.opened, description=f"Statuses: {', '.join(s.name for s in Status)}"
-    )
-    label: Label = Field(Label.bug, description=f"Issue types: {', '.join(l.name for l in Label)}.")
+    status: Status = Field(Status.opened, description=f"Statuses: {', '.join(Status.names())}")
+    label: Label = Field(Label.bug, description=f"Issue types: {', '.join(Label.names())}.")
 
 
 class IssueCreate(IssueBase):
@@ -37,11 +60,5 @@ class Issue(IssueBase):
     updated_at: Optional[datetime] = None  # pylint: disable=unsubscriptable-object
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    assignees: List["User"] = []
-    comments: List[Comment] = []
-
-
-from backend.schemas.users import User
-
-
-Issue.update_forward_refs()
+    class Config:
+        orm_mode = True
