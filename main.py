@@ -12,7 +12,7 @@ from logger import init_logger
 app = FastAPI(title="Bug Tracker")
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 # create logger
-init_logger(os.path.abspath(os.path.join(os.path.curdir, "logs", "bug_tracker.log")))
+init_logger()
 
 # define routers
 app.include_router(routers, prefix="/api/v1")
