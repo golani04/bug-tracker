@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     debug: bool
     admin_user: str
     admin_pass: str
+    admin_email: str
     app_name: str = "Bug Tracker"
 
     class Config:
