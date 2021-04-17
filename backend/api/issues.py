@@ -1,30 +1,33 @@
-from backend.schemas.util import find_item_by_id
-from fastapi import APIRouter, status, HTTPException
-from typing import List
+from typing import List, Tuple
+from urllib.parse import urljoin
 
-from backend.schemas.issues import Issue, IssueCreate
+from fastapi import APIRouter, Depends, Request, status
+from fastapi.responses import RedirectResponse
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from backend.db import get_db
+from backend.models.issues import Issue as IssueTable
+from backend.schemas.issues import Issue as IssueSchema
+from backend.schemas.issues import IssueCreate
 
 
 router = APIRouter()
 
 
-# @router.get("/", response_model=List[Issue])
-# def get_issues():
-#     return db.get_issues()
+@router.get("/", response_model=List[IssueSchema])
+def get_issues(session: Session = Depends(get_db)):
+    issues: List[Tuple[IssueTable]] = session.execute(select(IssueTable)).all()
+    return [issue for (issue,) in issues]
 
 
-# @router.post("/", response_model=Issue, status_code=status.HTTP_201_CREATED)
-# def create_issue(data: IssueCreate):
-#     issue = IssueCreate(data)
-#     return issue
+@router.post("/")
+async def create_issue(request: Request, session: Session = Depends(get_db)):
+    data = await request.form()
+    issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
+    session.add(issue)
+    session.commit()
 
-
-# @router.get("/{issue_id}", response_model=Issue)
-# def get_issue(issue_id: int):
-#     issue = find_item_by_id(db.get_issues(), issue_id)
-#     if issue is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND, detail="Required issue is missing"
-#         )
-
-#     return issue
+    return RedirectResponse(
+        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
+    )
