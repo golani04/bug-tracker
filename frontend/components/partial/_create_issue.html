@@ -5,19 +5,21 @@
                 <h5 class="modal-title">Create Issue</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/api/v1/issues" method="post">
+            <form action="/api/v1/issues" id="create-issue-form" method="post">
                 <input type="hidden" name="reporter" value="1">
                 <input type="hidden" name="project_id" value="1">
+                <input type="hidden" name="id" value="{{ current_issue.id }}">
 
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="issue-title" class="col-form-label">Title:</label>
-                        <input type="text" class="form-control" name="title" id="issue-title">
+                        <input type="text" class="form-control" name="title" id="issue-title"
+                            value="{{ current_issue.title }}">
                     </div>
                     <div class="mb-3">
                         <label for="issue-description" class="col-form-label">Description:</label>
                         <textarea class="form-control" name="description" id="issue-description"
-                            style="min-height: 4em;"></textarea>
+                            style="min-height: 4em;">{{ current_issue.description }}</textarea>
                     </div>
                     <div class="row mb-3">
                         {% for key, items in [('severity', severity), ('status', status), ('label', label)] %}
@@ -25,7 +27,14 @@
                             <label for="issue-{{ key }}" class="col-form-label">{{ key | title }}:</label>
                             <select class="form-select" name="{{ key }}" id="issue-{{ key }}">
                                 {% for item in items %}
-                                <option value="{{ item.value }}">{{ item.name | replace('_', ' ') | title }}</option>
+                                {% if current_issue.get(key)==item.value %}
+                                <option value="{{ item.value }}" selected>
+                                    {% else %}
+                                <option value="{{ item.value }}">
+                                    {% endif %}
+
+                                    {{ item.name | replace('_', ' ') | title }}
+                                </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -33,12 +42,36 @@
                     </div>
                     <div class="mb-3">
                         <label for="issue-due" class="col-form-label">Due:</label>
-                        <input type="date" class="form-control" name="due" id="issue-due" value="{{ current_date }}">
+                        <input type="date" class="form-control" name="due" id="issue-due"
+                            value="{{ current_issue.due or '' }}">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete-issue-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ current_issue.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/api/v1/issues" id="delete-issue-form" method="post">
+                <input type="hidden" name="id" value="{{ current_issue.id }}">
+                <input type="hidden" name="deleted" value="1">
+
+                <div class="modal-body">
+                    <p>Are sure you want to remove this issue.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Yes, delete</button>
                 </div>
             </form>
         </div>

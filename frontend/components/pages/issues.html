@@ -27,6 +27,7 @@
                                     <th scope="col">Severity</th>
                                     <th scope="col">Label</th>
                                     <th scope="col">Due</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,10 +38,22 @@
                                     <td>{{ issue.description | capitalize }}</td>
                                     <td>{{ issue.project.name | capitalize }}</td>
                                     <td>{{ issue.user.username }}</td>
-                                    <td>{{ issue.status | capitalize }}</td>
-                                    <td>{{ issue.severity | capitalize }}</td>
-                                    <td>{{ issue.label | capitalize }}</td>
+                                    <td>{{ issue.status | replace('_', ' ') | capitalize }}</td>
+                                    <td>{{ issue.severity | replace('_', ' ') | capitalize }}</td>
+                                    <td>{{ issue.label | replace('_', ' ') | capitalize }}</td>
                                     <td>{{ issue.due }}</td>
+                                    <td class="td-actions">
+                                        <a href="/issues?item_id={{ issue.id }}" rel="tooltip"
+                                            class="btn btn-info btn-simple btn-link"
+                                            data-bs-original-title="Edit Issue">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/issues?item_id={{ issue.id }}&deleted=1" rel="tooltip"
+                                            class="btn btn-danger btn-simple btn-link"
+                                            data-bs-original-title="Remove Issue">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
