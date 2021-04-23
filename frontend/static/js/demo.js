@@ -63,3 +63,48 @@ const demo = {
         });
     }
 }
+
+
+const clearClearForm = (elem) => {
+    if (!elem) return;
+
+    elem.addEventListener("show.bs.modal", (e) => {
+        if (!e.relatedTarget) return;
+
+        const form = elem.querySelector('#create-issue-form');
+        const elements = new Set(['id', 'title', 'description', 'due', 'severity', 'status', 'label']);
+
+        for (let item of form) {
+            if (elements.has(item.name)) {
+                if (item.nodeName == 'SELECT') {
+                    item.options[item.selectedIndex].removeAttribute('selected');
+                } else {
+                    item.value = '';
+                }
+            }
+        }
+    });
+}
+
+
+const showIssueModal = (createEl, delEl) => {
+    const location = window.location;
+    const hasItemId = location.href.includes('item_id');
+    const hasDeleted = location.href.includes('deleted');
+
+    if (location.pathname.includes('issue')) {
+        if (createEl && hasItemId && !hasDeleted) {
+            new bootstrap.Modal(createEl).show();
+        }
+        if (delEl && hasItemId && hasDeleted) {
+            new bootstrap.Modal(delEl).show();
+        }
+    }
+}
+
+const createIssueModal = document.querySelector('#create-issue-modal');
+const deleteIssueModal = document.querySelector('#delete-issue-modal');
+
+
+clearClearForm(createIssueModal);
+showIssueModal(createIssueModal, deleteIssueModal);
