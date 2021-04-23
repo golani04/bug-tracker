@@ -24,8 +24,17 @@ def get_issues(session: Session = Depends(get_db)):
 @router.post("/")
 async def create_issue(request: Request, session: Session = Depends(get_db)):
     data = await request.form()
-    issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
-    session.add(issue)
+    if not data.get("id"):
+        issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
+        session.add(issue)
+    else:
+        query = session.query(IssueTable).filter(IssueTable.id == data["id"])
+
+        if data.get("deleted") == "1":
+            query.delete()
+        else:
+            query.update(IssueSchema(**data).dict(exclude_unset=True))
+
     session.commit()
 
     return RedirectResponse(
