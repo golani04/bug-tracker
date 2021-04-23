@@ -8,18 +8,18 @@
             <form action="/api/v1/issues" id="create-issue-form" method="post">
                 <input type="hidden" name="reporter" value="1">
                 <input type="hidden" name="project_id" value="1">
-                <input type="hidden" name="id" value="{{ current_issue.id }}">
+                <input type="hidden" name="id" value="{{ current_item.id }}">
 
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="issue-title" class="col-form-label">Title:</label>
                         <input type="text" class="form-control" name="title" id="issue-title"
-                            value="{{ current_issue.title }}">
+                            value="{{ current_item.title }}">
                     </div>
                     <div class="mb-3">
                         <label for="issue-description" class="col-form-label">Description:</label>
                         <textarea class="form-control" name="description" id="issue-description"
-                            style="min-height: 4em;">{{ current_issue.description }}</textarea>
+                            style="min-height: 4em;">{{ current_item.description }}</textarea>
                     </div>
                     <div class="row mb-3">
                         {% for key, items in [('severity', severity), ('status', status), ('label', label)] %}
@@ -27,7 +27,7 @@
                             <label for="issue-{{ key }}" class="col-form-label">{{ key | title }}:</label>
                             <select class="form-select" name="{{ key }}" id="issue-{{ key }}">
                                 {% for item in items %}
-                                {% if current_issue.get(key)==item.value %}
+                                {% if current_item.get(key)==item.value %}
                                 <option value="{{ item.value }}" selected>
                                     {% else %}
                                 <option value="{{ item.value }}">
@@ -43,7 +43,7 @@
                     <div class="mb-3">
                         <label for="issue-due" class="col-form-label">Due:</label>
                         <input type="date" class="form-control" name="due" id="issue-due"
-                            value="{{ current_issue.due or '' }}">
+                            value="{{ current_item.due or '' }}">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -59,11 +59,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ current_issue.title }}</h5>
+                <h5 class="modal-title">{{ current_item.title }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="/api/v1/issues" id="delete-issue-form" method="post">
-                <input type="hidden" name="id" value="{{ current_issue.id }}">
+                <input type="hidden" name="id" value="{{ current_item.id }}">
                 <input type="hidden" name="deleted" value="1">
 
                 <div class="modal-body">
