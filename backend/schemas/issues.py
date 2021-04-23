@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import IntEnum, auto
 from typing import Optional
 
-from pydantic import BaseModel, Field  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, Field, validator  # pylint: disable=no-name-in-module
 
 
 class Helpers(IntEnum):
@@ -43,12 +43,19 @@ class IssueBase(BaseModel):
     project_id: int
     title: str
     description: str = ""
-    due: Optional[date] = None
+    due: Optional[date] = Field(None)
     severity: Severity = Field(
         Severity.low, description=f"Severity levels: {', '.join(Severity.names())}."
     )
     status: Status = Field(Status.opened, description=f"Statuses: {', '.join(Status.names())}")
     label: Label = Field(Label.bug, description=f"Issue types: {', '.join(Label.names())}.")
+
+    @validator("due", pre=True)
+    def parse_due(cls, value: Optional[date]):
+        if not value:
+            return None
+
+        return value
 
 
 class IssueCreate(IssueBase):
