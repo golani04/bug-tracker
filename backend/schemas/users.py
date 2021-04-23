@@ -16,16 +16,20 @@ class UserBase(BaseModel):
     lastname: str
     username: str
     email: EmailStr
-    type: UserType = Field(UserType.viewer)
+    role: UserType = Field(UserType.viewer)
 
 
 class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(UserBase):
+    pass
+
+
 class User(UserBase):
     id: int
-    updated_at: Optional[datetime] = Field(...)  # pylint: disable=unsubscriptable-object
+    updated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
