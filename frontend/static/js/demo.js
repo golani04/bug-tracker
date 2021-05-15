@@ -1,49 +1,33 @@
 const type = ['primary', 'info', 'success', 'warning', 'danger'];
 
 const demo = {
-    initPickColor: function () {
-        $('.pick-class-label').click(function () {
-            var new_class = $(this).attr('new-class');
-            var old_class = $('#display-buttons').attr('data-class');
-            var display_div = $('#display-buttons');
-            if (display_div.length) {
-                var display_buttons = display_div.find('.btn');
-                display_buttons.removeClass(old_class);
-                display_buttons.addClass(new_class);
-                display_div.attr('data-class', new_class);
-            }
-        });
-    },
-
-
-    initDashboardPageCharts: function () {
-
-        const chartPreferences = document.querySelector('#chartPreferences');
+    initDashboardPageCharts: async () => {
+        const chartPreferences = document.querySelector('#chart-issues');
         if (!chartPreferences) return;
 
-        var dataPreferences = {
-            series: [
-                [25, 30, 20, 25]
-            ]
-        };
+        const [issues, details] = await Promise.all([fetch('/api/v1/issues').then(response => response.json()), fetch('/api/v1/issues/details').then(response => response.json())]);
+        console.log(issues);
+        console.log(details);
+        // severity
+        const severityColors = ['text-info', 'text-warning', 'text-danger'];
+        const data = { 'labels': [], 'series': [] };
+        const counter = {};
 
-        var optionsPreferences = {
-            donut: true,
-            donutWidth: 40,
-            startAngle: 0,
-            total: 100,
-            showLabel: false,
-            axisX: {
-                showGrid: false
-            }
-        };
+        for (let issue of issues) {
+            // count number of issues by severity
+            counter[issue.severity] = counter[issue.severity] ? counter[issue.severity] + 1 : 1;
+        }
 
-        Chartist.Pie('#chartPreferences', dataPreferences, optionsPreferences);
 
-        Chartist.Pie('#chartPreferences', {
-            labels: ['53%', '36%', '11%'],
-            series: [53, 36, 11]
-        });
+        for (let key in counter) {
+            data['series'][key] = parseInt(counter[key] / issues.length * 100);
+            data['labels'][key] = `${data['series'][key]}%`;
+        }
+
+        console.log(counter);
+        console.log(data);
+
+        Chartist.Pie('#chart-issues', data);
     },
 
     showNotification: function (from, align) {
@@ -64,7 +48,7 @@ const demo = {
     }
 }
 
-
+// open/close modals for issues
 const clearClearForm = (elem) => {
     if (!elem) return;
 
