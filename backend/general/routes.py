@@ -1,5 +1,4 @@
 import logging
-from datetime import date
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -9,7 +8,6 @@ from backend.db import get_db
 from backend.models.issues import Issue as IssueTable
 from backend.models.users import User as UserTable
 from backend.schemas.issues import Issue as IssueSchema
-from backend.schemas.projects import Project as ProjectSchema
 from backend.schemas.users import User as UserSchema
 from backend.utils.html import templates
 
