@@ -6,6 +6,8 @@
 
 Starting dev server run: `poetry run uvicorn main:app --reload`
 
+Output `requirements.txt`: `poetry export -o requirements.txt > requirements.txt --without-hashes`
+
 [Trello cards](https://trello.com/b/sIgFvLWc/bug-tracker).
 
 ## Possible stack
