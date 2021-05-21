@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 100
-target-version = ['py38']
+target-version = ["py38"]
 exclude = '''
 (
   /(
@@ -19,7 +19,34 @@ include_trailing_comma = true
 line_length = 100
 lines_after_imports = 2
 multi_line_output = 3
-sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.coverage.run]
+# when line in code could jump to more than 
+# one next line, track which destinations 
+# were visited
+branch = true
+
+omit = '''
+    # exclude tests folder
+    tests/*
+    # exclude venv files
+    */venv/*
+    # exclude init files
+    *\__init__.py
+'''
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if __name__ == .__main__.:"]
+
+[tool.coverage.html]
+directory = "reports"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--color=yes --cov=backend --cov-report=html --cov-report=term -ra"
+testpaths = ["tests"]
+markers = ["api"]
 
 [tool.poetry]
 name = "bug-tracker"
