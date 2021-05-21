@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from enum import IntEnum, auto
-from typing import Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Field, validator  # pylint: disable=no-name-in-module
 
@@ -38,11 +38,18 @@ class Label(Helpers):
     wontfix = auto()
 
 
+class IssueDetails(BaseModel):
+    label: Dict[Label, str]
+    status: Dict[Status, str]
+    severity: Dict[Severity, str]
+
+
 class IssueBase(BaseModel):
     reporter: int
     project_id: int
     title: str
     description: str = ""
+    type: Optional[str] = Field(None)
     due: Optional[date] = Field(None)
     severity: Severity = Field(
         Severity.low, description=f"Severity levels: {', '.join(Severity.names())}."
