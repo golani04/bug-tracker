@@ -1,5 +1,4 @@
 from urllib.parse import urljoin
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
