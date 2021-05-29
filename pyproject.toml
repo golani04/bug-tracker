@@ -44,7 +44,7 @@ directory = "reports"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--color=yes --cov=backend --cov-report=html --cov-report=term -ra"
+# addopts = "--color=yes --cov=backend --cov-report=html --cov-report=term -ra"
 testpaths = ["tests"]
 markers = ["api"]
 
