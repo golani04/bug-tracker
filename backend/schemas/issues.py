@@ -46,16 +46,13 @@ class IssueDetails(BaseModel):
 
 class IssueBase(BaseModel):
     reporter: int
-    project_id: int
     title: str
     description: str = ""
     type: Optional[str] = Field(None)
     due: Optional[date] = Field(None)
-    severity: Severity = Field(
-        Severity.low, description=f"Severity levels: {', '.join(Severity.names())}."
-    )
-    status: Status = Field(Status.opened, description=f"Statuses: {', '.join(Status.names())}")
-    label: Label = Field(Label.bug, description=f"Issue types: {', '.join(Label.names())}.")
+    severity: Severity = Field(Severity.low, description=f"Severity levels: {Severity.names()}.")
+    status: Status = Field(Status.opened, description=f"Statuses: {Status.names()}")
+    label: Label = Field(Label.bug, description=f"Issue types: {Label.names()}.")
 
     @validator("due", pre=True)
     def parse_due(cls, value: Optional[date]):

@@ -24,8 +24,8 @@ class Issue(Base):
         Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False
     )
 
-    created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime, onupdate=datetime.utcnow(), default=None)
-    active = Column(Boolean, dafault=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow, default=None)
+    active = Column(Boolean, default=True)
 
     owner = relationship("User", back_populates="issues")
