@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Table
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship
 
 from backend.db import Base
@@ -17,11 +17,11 @@ class User(Base):
     firstname = Column(String(255), nullable=False)
     lastname = Column(String(255), nullable=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime, onupdate=datetime.utcnow())
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, onupdate=datetime.utcnow, default=None)
     active = Column(Boolean, default=True)
 
-    issues = relationship("Issue", back_populates="reporter")
+    issues = relationship("Issue", back_populates="owner")
 
     @classmethod
     def create_user(cls, email, username, password, fname, lname: str, /):
