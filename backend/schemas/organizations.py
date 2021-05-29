@@ -4,7 +4,6 @@ from uuid import UUID
 
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
-from backend.schemas.projects import Project
 from backend.schemas.users import User
 
 
@@ -27,5 +26,4 @@ class Organization(OrganizationBase):
     id: UUID
     license: License
 
-    projects: List[Project]
     users: List[User]
