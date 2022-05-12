@@ -1,9 +1,8 @@
-from backend.schemas.issues import Label, Severity, Status
 from backend.db import Base, engine, get_db
-from backend.models import projects, users, issues
-from backend.schemas.users import UserType
-from config import settings
+from backend.models import issues, users
+from backend.schemas.issues import Label, Severity, Status
 
+from config import settings
 
 # init database
 Base.metadata.create_all(bind=engine)
@@ -17,12 +16,11 @@ session.add(
         settings.admin_email,
         settings.admin_user,
         settings.admin_pass,
-        "Admin",
-        "Admin",
-        int(UserType.admin),
+        "Leonid",
+        "Spivak",
     )
 )
-session.add(projects.Project.create("Bug tracker", 1))
+
 session.add_all(
     [
         issues.Issue(
@@ -32,7 +30,6 @@ session.add_all(
             status=Status.opened,
             label=Label.enhancement,
             reporter=1,
-            project_id=1,
         ),
         issues.Issue(
             title="Create issue form",
@@ -41,7 +38,6 @@ session.add_all(
             status=Status.opened,
             label=Label.enhancement,
             reporter=1,
-            project_id=1,
         ),
     ]
 )
