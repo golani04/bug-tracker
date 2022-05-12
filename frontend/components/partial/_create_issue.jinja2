@@ -5,9 +5,9 @@
                 <h5 class="modal-title">Create Issue</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/api/v1/issues" id="create-issue-form" method="post">
+            <form action="/api/v1/issues{{ '/' + (current_item.id|string) if current_item else ''}}"
+                id="create-issue-form" method="post">
                 <input type="hidden" name="reporter" value="1">
-                <input type="hidden" name="project_id" value="1">
                 <input type="hidden" name="id" value="{{ current_item.id }}">
 
                 <div class="modal-body">
@@ -62,10 +62,7 @@
                 <h5 class="modal-title">{{ current_item.title }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/api/v1/issues" id="delete-issue-form" method="post">
-                <input type="hidden" name="id" value="{{ current_item.id }}">
-                <input type="hidden" name="deleted" value="1">
-
+            <form action="/api/v1/issues/{{ current_item.id }}/delete" id="delete-issue-form" method="post">
                 <div class="modal-body">
                     <p>Are sure you want to remove this issue.</p>
                 </div>

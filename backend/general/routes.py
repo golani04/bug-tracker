@@ -16,14 +16,14 @@ router = APIRouter()
 logger = logging.getLogger("bug_tracker")
 
 
-def get_issues_data(data: List[IssueTable], item_id: int):
+def get_issues_data(issues: List[IssueTable], item_id: int):
     data = [
         {
             **IssueSchema.from_orm(item).dict(),
-            "project": ProjectSchema.from_orm(item.project),
+            # "project": ProjectSchema.from_orm(item.project),
             "user": UserSchema.from_orm(item.owner),
         }
-        for item in data
+        for item in issues
     ]
 
     return data, next((issue for issue in data if issue["id"] == item_id), {})
@@ -40,13 +40,13 @@ def index(
     if template is None:
         return templates.TemplateResponse("index.html", {"request": request, "current_item": {}})
 
-    data = []
+    data: List[IssueTable] = []
     current_item = {}
     if template.startswith("issues"):
-        data: List[IssueTable] = session.query(IssueTable).all()
+        data = session.query(IssueTable).all()
         data, current_item = get_issues_data(data, item_id)
     elif template.startswith("user"):
-        user: List[IssueTable] = session.query(UserTable).one_or_none()
+        user: List[UserTable] = session.query(UserTable).one_or_none()
         current_item = UserSchema.from_orm(user).dict()
 
     template = template if template.endswith(".html") else f"{template}.html"
