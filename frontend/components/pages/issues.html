@@ -11,7 +11,7 @@
                 <div class="card strpied-tabled-with-hover">
                     <div class="card-header">
                         <h4 class="card-title">Issues</h4>
-                        <p class="card-category">List of projects issues</p>
+                        <p class="card-category">List of issues</p>
                     </div>
                     <div class="card-body table-full-width table-responsive">
                         <table class="table table-hover table-striped">
@@ -21,7 +21,6 @@
                                     <th scope="col">ID</th>
                                     <th scope="col">Title</th>
                                     <th scope="col">Description</th>
-                                    <th scope="col">Project Name</th>
                                     <th scope="col">Username</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Severity</th>
@@ -36,7 +35,6 @@
                                     <td>{{ issue.id }}</td>
                                     <td>{{ issue.title | capitalize }}</td>
                                     <td>{{ issue.description | capitalize }}</td>
-                                    <td>{{ issue.project.name | capitalize }}</td>
                                     <td>{{ issue.user.username }}</td>
                                     <td>{{ issue.status | replace('_', ' ') | capitalize }}</td>
                                     <td>{{ issue.severity | replace('_', ' ') | capitalize }}</td>
@@ -49,8 +47,8 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="/issues?item_id={{ issue.id }}&deleted=1" rel="tooltip"
-                                            class="btn btn-danger btn-simple btn-link"
-                                            data-bs-original-title="Remove Issue">
+                                            data-bs-original-title="Remove Issue"
+                                            class="btn btn-danger btn-simple btn-link">
                                             <i class="fas fa-times"></i>
                                         </a>
                                     </td>

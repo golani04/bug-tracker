@@ -1,3 +1,4 @@
+import logging
 from typing import List, Tuple
 from urllib.parse import urljoin
 
@@ -8,11 +9,11 @@ from sqlalchemy.orm import Session
 
 from backend.db import get_db
 from backend.models.issues import Issue as IssueTable
-from backend.schemas.issues import Issue as IssueSchema
-from backend.schemas.issues import IssueCreate, IssueDetails, Label, Severity, Status
+from backend.schemas.issues import Issue as IssueSchema, IssueCreate, IssueUpdate
 
 
 router = APIRouter()
+logger = logging.getLogger("bug_tracker")
 
 
 @router.get("/", response_model=List[IssueSchema])
@@ -24,17 +25,9 @@ def get_issues(session: Session = Depends(get_db)):
 @router.post("/")
 async def create_issue(request: Request, session: Session = Depends(get_db)):
     data = await request.form()
-    if not data.get("id"):
-        issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
-        session.add(issue)
-    else:
-        query = session.query(IssueTable).filter(IssueTable.id == data["id"])
 
-        if data.get("deleted") == "1":
-            query.delete()
-        else:
-            query.update(IssueSchema(**data).dict(exclude_unset=True))
-
+    issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
+    session.add(issue)
     session.commit()
 
     return RedirectResponse(
@@ -42,14 +35,37 @@ async def create_issue(request: Request, session: Session = Depends(get_db)):
     )
 
 
-@router.get(
-    "/details", status_code=status.HTTP_200_OK, tags=["Issues"], response_model=IssueDetails
-)
-def get_issue_details():
-    return {
-        "label": {int(label): str(label).replace("_", " ").title() for label in Label},
-        "status": {int(status): str(status).replace("_", " ").title() for status in Status},
-        "severity": {
-            int(severity): str(severity).replace("_", " ").title() for severity in Severity
-        },
-    }
+@router.put("/{issue_id}")
+@router.post("/{issue_id}")
+async def update_issue(issue_id: int, request: Request, session: Session = Depends(get_db)):
+    data = await request.form()
+    logger.info(data)
+
+    logger.info(IssueUpdate(**data).dict(exclude_unset=True))
+    results: int = (
+        session.query(IssueTable)
+        .filter(IssueTable.id == issue_id)
+        .update(IssueUpdate(**data).dict(exclude_unset=True))
+    )
+
+    session.commit()
+
+    if not results:
+        logger.warning(f"Issue #{issue_id} has not been updated.")
+
+    return RedirectResponse(
+        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@router.delete("/{issue_id}")
+@router.post("/{issue_id}/delete")
+async def delete_issue(issue_id: int, request: Request, session: Session = Depends(get_db)):
+    issue: IssueTable = session.query(IssueTable).filter_by(id=issue_id).first()
+
+    issue.delete()  # soft delete
+    session.commit()
+
+    return RedirectResponse(
+        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
+    )
