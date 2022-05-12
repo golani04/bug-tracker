@@ -1,14 +1,11 @@
-from datetime import datetime
-
-from sqlalchemy import Column, DateTime, Date, ForeignKey, Integer, SmallInteger, String, Text
+from sqlalchemy import Column, Date, ForeignKey, Integer, SmallInteger, String, Text
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import Boolean
 
-from backend.db import Base
+from backend.models.base import BaseModel
 from backend.schemas.issues import Label, Severity, Status
 
 
-class Issue(Base):
+class Issue(BaseModel):
     __tablename__ = "issues"
 
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -23,9 +20,5 @@ class Issue(Base):
     reporter = Column(
         Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False
     )
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, onupdate=datetime.utcnow, default=None)
-    active = Column(Boolean, default=True)
 
     owner = relationship("User", back_populates="issues")

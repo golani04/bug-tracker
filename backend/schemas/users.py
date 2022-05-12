@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import IntEnum
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field  # pylint: disable=no-name-in-module
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserType(IntEnum):
