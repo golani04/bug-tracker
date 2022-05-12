@@ -1,13 +1,11 @@
-from datetime import datetime
-
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from backend.db import Base
+from backend.models.base import BaseModel
 from backend.utils.auth import hash_password
 
 
-class User(Base):
+class User(BaseModel):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
@@ -16,10 +14,6 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     firstname = Column(String(255), nullable=False)
     lastname = Column(String(255), nullable=False)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, onupdate=datetime.utcnow, default=None)
-    active = Column(Boolean, default=True)
 
     issues = relationship("Issue", back_populates="owner")
 
