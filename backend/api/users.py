@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urljoin
 
 from fastapi import APIRouter, Depends, Request, status
@@ -11,6 +12,7 @@ from backend.schemas.users import UserUpdate
 
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/{user_id}")

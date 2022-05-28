@@ -8,7 +8,7 @@ from backend.models.users import User
 from backend.schemas.issues import Issue as IssueSchema
 from backend.schemas.issues import Label, Severity, Status
 from backend.schemas.users import User as UserSchema
-from backend.utils.auth import hash_password
+from backend.utils.security import hash_password
 
 
 logger = logging.getLogger("bug_tracker")

@@ -13,11 +13,13 @@ session = next(get_db())
 
 session.add(
     users.User.create_user(
-        settings.admin_email,
-        settings.admin_user,
-        settings.admin_pass,
-        "Leonid",
-        "Spivak",
+        **dict(
+            email=settings.admin_email,
+            username=settings.admin_user,
+            password=settings.admin_pass,
+            firstname="Leonid",
+            lastname="Spivak",
+        ),
     )
 )
 
