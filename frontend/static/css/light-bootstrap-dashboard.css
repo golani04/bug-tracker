@@ -1990,7 +1990,7 @@ fieldset[disabled] .form-control {
 	margin-top: 10px;
 	vertical-align: middle;
 	border-top: 4px dashed;
-	border-top: 4px solid\9;
+	border-bottom: 4px solid;
 	border-right: 4px solid transparent;
 	border-left: 4px solid transparent;
 }
