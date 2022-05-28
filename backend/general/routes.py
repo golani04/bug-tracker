@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from backend.db import get_db
 from backend.models.issues import Issue as IssueTable
-from backend.models.users import User as UserTable
 from backend.schemas.issues import Issue as IssueSchema
 from backend.schemas.users import User as UserSchema
+from backend.utils.auth import auth_manager
 from backend.utils.html import templates
 
 
@@ -36,6 +36,7 @@ def index(
     template: str = None,
     item_id: int = Query(None),
     session: Session = Depends(get_db),
+    current_user=Depends(auth_manager.get_current_user),
 ):
     if template is None:
         return templates.TemplateResponse("index.html", {"request": request, "current_item": {}})
@@ -46,8 +47,7 @@ def index(
         data = session.query(IssueTable).all()
         data, current_item = get_issues_data(data, item_id)
     elif template.startswith("user"):
-        user: List[UserTable] = session.query(UserTable).one_or_none()
-        current_item = UserSchema.from_orm(user).dict()
+        current_item = UserSchema.from_orm(current_user).dict()
 
     template = template if template.endswith(".html") else f"{template}.html"
     return templates.TemplateResponse(
