@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from backend.models.base import BaseModel
-from backend.utils.auth import hash_password
+from backend.utils.security import hash_password
 
 
 class User(BaseModel):
@@ -18,11 +18,11 @@ class User(BaseModel):
     issues = relationship("Issue", back_populates="owner")
 
     @classmethod
-    def create_user(cls, email, username, password, fname, lname: str, /):
+    def create_user(cls, email: str, username: str, password: str, firstname: str, lastname: str):
         return cls(
             email=email,
             username=username,
             password=hash_password(password),
-            firstname=fname,
-            lastname=lname,
+            firstname=firstname,
+            lastname=lastname,
         )

@@ -1,14 +1,7 @@
 from datetime import datetime
-from enum import IntEnum
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
-
-
-class UserType(IntEnum):
-    admin = 0
-    developer = 4
-    viewer = 8
 
 
 class UserBase(BaseModel):
@@ -16,7 +9,6 @@ class UserBase(BaseModel):
     lastname: str
     username: str
     email: EmailStr
-    role: UserType = Field(UserType.viewer)
 
 
 class UserCreate(UserBase):
