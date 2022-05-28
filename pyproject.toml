@@ -49,7 +49,7 @@ markers = ["api"]
 [tool.poetry]
 name = "bug-tracker"
 license = "MIT"
-version = "0.1.0"
+version = "0.2.0"
 readme = "README.md"
 description = "Register issues that occured in the projects."
 authors = ["Leonid <golani04@gmail.com>"]
