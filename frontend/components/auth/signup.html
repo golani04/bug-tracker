@@ -1,0 +1,53 @@
+{% extends "main/base-raw.html" %}
+
+{% set title = 'Register' %}
+
+{% block main %}
+
+<div class="container col-xxl-4 col-lg-6 col-md-12 my-4">
+
+    <form class="row g-3" action="/auth/signup" method="POST">
+
+        <h3 class="h3 fw-normal">Sign up</h3>
+
+        <div class="col-12">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="firstname" id="firstname" placeholder="first name">
+                <label for="firstname">First Name</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="lastname" id="lastname" placeholder="last name">
+                <label for="lastname">Last Name</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="email" id="email" placeholder="email">
+                <label for="email">Email</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="username" id="username" placeholder="username">
+                <label for="username">Username</label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-floating">
+                <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Sign up</button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "main/base-raw.html" %}
 
 {% set title = 'Login' %}
 
@@ -6,7 +6,7 @@
 
 <div class="container col-xxl-4 col-lg-6 col-md-12 my-4">
 
-    <form class="row g-3" action="/auth/login" method="post">
+    <form class="row g-3" action="/auth/login" method="POST">
 
         <h3 class="h3 fw-normal">Sign in</h3>
 
@@ -26,7 +26,12 @@
 
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Sign in</button>
+            <p class="mt-4 text-sm text-center">
+                Don't have an account?
+                <a href="/auth/signup" class="text-primary text-gradient font-weight-bold">Sign up</a>
+            </p>
         </div>
+
 
     </form>
 
