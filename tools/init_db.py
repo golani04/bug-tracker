@@ -1,4 +1,5 @@
-from backend.db import Base, engine, get_db
+from backend.db import engine, get_db
+from backend.models.base import Base
 from backend.models import issues, users
 from backend.schemas.issues import Label, Severity, Status
 

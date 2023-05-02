@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 from sqlalchemy import Boolean, Column, DateTime
+from sqlalchemy.orm import DeclarativeBase
 
-from backend.db import Base
+
+class Base(DeclarativeBase):
+    pass
 
 
 class BaseModel(Base):
