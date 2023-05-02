@@ -64,7 +64,9 @@ class _Authorization:
 
         return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=self.algorithm)
 
-    async def get_current_user(self, request: Request, sess: Session = Depends(get_db)) -> User:
+    async def get_current_user(
+        self, request: Request, sess: Session = Depends(get_db)
+    ) -> User | None:
         payload: Dict = self._payload(self._get_token(request))
 
         return sess.query(User).filter_by(id=payload["id"]).first()
