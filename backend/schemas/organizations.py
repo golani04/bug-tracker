@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum, auto
 from typing import List
 from uuid import UUID
 
@@ -7,11 +7,11 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from backend.schemas.users import User
 
 
-class License(Enum):
+class License(IntEnum):
     free = 1
-    trial = 2
-    basic = 3
-    professional = 4
+    trial = auto()
+    basic = auto()
+    professional = auto()
 
 
 class OrganizationBase(BaseModel):
