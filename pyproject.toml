@@ -60,7 +60,7 @@ fastapi = "^0.95.1"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pydantic = {extras = ["dotenv", "email"], version = "^1.10.7"}
 uvicorn = "^0.22.0"
-requests = "^2.29.0"
+requests = "^2.31.0"
 SQLAlchemy = "^2.0.11"
 Jinja2 = "^3.1.2"
 aiofiles = "^23.1.0"
