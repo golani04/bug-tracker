@@ -3,11 +3,13 @@ line-length = 100
 exclude = '''
 (
   /(
-      \.eggs         # exclude a few common directories in the
+    | \.eggs         # exclude a few common directories in the
     | \.git          # root of the project
     | \.hg
     | \.mypy_cache
+    | \.pytest_cache
     | \.tox
+    | __pycache__
   )/
 )
 '''
@@ -42,6 +44,7 @@ directory = "reports"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+asyncio_mode = "auto"
 # addopts = "--color=yes --cov=backend --cov-report=html --cov-report=term -ra"
 testpaths = ["tests"]
 markers = ["api"]
@@ -55,21 +58,23 @@ description = "Register issues that occured in the projects."
 authors = ["Leonid <golani04@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.95.2"
-passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-pydantic = {extras = ["dotenv", "email"], version = "^1.10.7"}
-uvicorn = "^0.22.0"
-requests = "^2.30.0"
-SQLAlchemy = "^2.0.15"
-Jinja2 = "^3.1.2"
-aiofiles = "^23.1.0"
+python = "^3.12"
+fastapi = "^0.110.0"
+bcrypt = "4.0.1"
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+pydantic = { extras = ["email"], version = "^2.6.3" }
+pydantic-settings = "^2.2.1"
+uvicorn = "^0.27.1.0"
+requests = "^2.31.0"
+SQLAlchemy = "^2.0.27"
+Jinja2 = "^3.1.3"
+aiofiles = "^23.2.1"
 python-multipart = "^0.0.6"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-aiohttp = "^3.8.4"
-gunicorn = "^20.1.0"
+python-jose = { extras = ["cryptography"], version = "^3.3.0" }
+aiohttp = "^3.9.3.5"
+gunicorn = "^21.2.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 bandit = "^1.7.5"
 black = "^23.3.0"
 coverage = "^7.2.5"
@@ -78,6 +83,8 @@ freezegun = "^1.2.2"
 isort = "^5.12.0"
 pytest = "^7.3.1"
 mypy = "^1.3.0"
+httpx = "^0.27.0"
+pytest-asyncio = "^0.23.5.post1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
