@@ -2,10 +2,12 @@ from functools import lru_cache
 from typing import Tuple
 
 from jose.constants import Algorithms
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
+
     app_name: str = "Bug Tracker"
     sqlalchemy_database_url: str
     debug: bool
@@ -17,9 +19,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str = Algorithms.HS256
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 180
-
-    class Config:
-        env_file = ".env"
 
 
 @lru_cache()
