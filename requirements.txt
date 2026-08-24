@@ -89,7 +89,7 @@ python-dotenv==1.2.3
     # via pydantic-settings
 python-jose==3.5.0
     # via bug-tracker
-python-multipart==0.0.6
+python-multipart==0.0.31
     # via bug-tracker
 requests==2.34.2
     # via bug-tracker
