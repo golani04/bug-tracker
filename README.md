@@ -4,9 +4,37 @@
 
 ## Development
 
-Starting dev server run: `poetry run uvicorn main:app --reload`
+Install Python 3.14 and create the project environment:
 
-Output `requirements.txt`: `poetry export -o requirements.txt > requirements.txt --without-hashes`
+```sh
+uv python install 3.14
+uv sync --dev
+```
+
+Starting dev server run:
+
+```sh
+uv run uvicorn main:app --reload
+```
+
+Output `requirements.txt`:
+
+```sh
+uv export --no-dev --format requirements-txt --no-hashes --output-file requirements.txt
+```
+
+Create and init db:
+
+```sh
+uv run python -m tools.init_db
+```
+
+Format, lint, and sort imports with Ruff:
+
+```sh
+uv run ruff format .
+uv run ruff check --fix .
+```
 
 [Trello cards](https://trello.com/b/sIgFvLWc/bug-tracker).
 
@@ -27,7 +55,7 @@ Back end:
   - Flask
   - FastAPI
 - Pytest
-- Poetry
+- uv
 - Microservices
 - `TODO`: integrate [pydantic](https://pydantic-docs.helpmanual.io/). Data validation library.
 
@@ -49,7 +77,8 @@ Database:
 
 ### Project structure
 
-- Organization
+- Project
   - Users
   - Projects
     - Issues
+      - Comments
