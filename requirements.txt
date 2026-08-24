@@ -99,7 +99,7 @@ six==1.17.0
     # via ecdsa
 sqlalchemy==2.0.52
     # via bug-tracker
-starlette==0.37.2
+starlette==1.3.1
     # via fastapi
 typing-extensions==4.16.0
     # via
