@@ -5,8 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from backend.api import routers
 from backend.auth import auth_routers
 from backend.general import main_router
+from backend.logger import init_logger
 from backend.utils.exceptions import AuthError
-from logger import init_logger
 
 
 app = FastAPI(title="Bug Tracker")
