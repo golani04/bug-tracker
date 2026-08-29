@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend import models
 from backend.models.base import BaseModel
 from backend.utils.security import hash_password
 
@@ -8,21 +9,16 @@ from backend.utils.security import hash_password
 class User(BaseModel):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String(255), unique=True, nullable=False, index=True)
-    password = Column(String(128), nullable=True)
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    firstname = Column(String(255), nullable=False)
-    lastname = Column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(128), nullable=False)
 
-    issues = relationship("Issue", back_populates="owner")
+    projects: Mapped[list["models.projects.Project"]] = relationship(
+        "Project", back_populates="owner"
+    )
+    reporter_issues: Mapped[list["models.issues.Issue"]] = relationship(
+        "Issue", back_populates="reporter"
+    )
 
     @classmethod
-    def create_user(cls, email: str, username: str, password: str, firstname: str, lastname: str):
-        return cls(
-            email=email,
-            username=username,
-            password=hash_password(password),
-            firstname=firstname,
-            lastname=lastname,
-        )
+    def create_user(cls, email: str, password: str) -> "User":
+        return User(email=email, password_hash=hash_password(password))

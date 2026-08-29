@@ -1,6 +1,9 @@
-from datetime import datetime, timezone
-from sqlalchemy import Boolean, Column, DateTime
-from sqlalchemy.orm import DeclarativeBase
+from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from backend.utils.time import utcnow
 
 
 class Base(DeclarativeBase):
@@ -12,12 +15,15 @@ class BaseModel(Base):
 
     __abstract__ = True
 
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, onupdate=lambda: datetime.now(timezone.utc), default=None)
-    deleted_at = Column(DateTime, default=None)
-    active = Column(Boolean, default=True)
+    id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, onupdate=utcnow, default=None)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     def delete(self):
         """Soft delete"""
+
         self.active = False
-        self.deleted_at = datetime.now(timezone.utc)
+        self.deleted_at = utcnow()
