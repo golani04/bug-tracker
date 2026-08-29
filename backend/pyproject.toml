@@ -68,5 +68,5 @@ directory = "reports"
 [tool.pytest.ini_options]
 minversion = "7.3"
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["backend/tests"]
 markers = ["api: marks API tests"]
