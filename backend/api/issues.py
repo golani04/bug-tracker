@@ -1,71 +1,49 @@
-import logging
-from typing import List, Tuple
-from urllib.parse import urljoin
-
-from fastapi import APIRouter, Depends, Request, status
-from fastapi.responses import RedirectResponse
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from backend.db import get_db
-from backend.models.issues import Issue as IssueTable
-from backend.schemas.issues import Issue as IssueSchema, IssueCreate, IssueUpdate
+from backend.logger import logger
+from backend.repositories.issues import IssueRepository
+from backend.schemas.common import IdResponse
+from backend.schemas.issues import Issue as IssueSchema, IssueUpdate
+from backend.schemas.users import User as UserSchema
+from backend.services.issues import IssueService
+from backend.utils.auth import auth_manager
 
 
 router = APIRouter()
-logger = logging.getLogger("bug_tracker")
 
 
-@router.get("/", response_model=List[IssueSchema])
-def get_issues(session: Session = Depends(get_db)):
-    issues: List[Tuple[IssueTable]] = session.execute(select(IssueTable)).all()
-    return [IssueSchema.from_orm(issue).dict() for (issue,) in issues]
+@router.get("/{issue_id}", response_model=IssueSchema, status_code=status.HTTP_200_OK)
+async def get_issue(
+    issue_id: int,
+    current_user: UserSchema = Depends(auth_manager.get_current_user),
+    session: Session = Depends(get_db),
+):
+    service = IssueService(IssueRepository(session))
+    try:
+        return service.get_issue(issue_id, current_user.id)
+    except ValueError as error:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Issue not found") from error
 
 
-@router.post("/")
-async def create_issue(request: Request, session: Session = Depends(get_db)):
-    data = await request.form()
+@router.patch("/{issue_id}", response_model=IdResponse, status_code=status.HTTP_200_OK)
+async def update_issue(
+    issue_id: int,
+    data: IssueUpdate,
+    current_user: UserSchema = Depends(auth_manager.get_current_user),
+    session: Session = Depends(get_db),
+):
+    service = IssueService(IssueRepository(session, filters={"id": issue_id, "active": True}))
+    try:
+        service.get_issue(issue_id, current_user.id)
+    except ValueError as error:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Issue not found") from error
 
-    issue: IssueTable = IssueTable(**IssueCreate(**data).dict())
-    session.add(issue)
-    session.commit()
+    try:
+        updated_id = service.update_issue(data)
+    except ValueError as error:
+        logger.error(f"Failed to update issue {issue_id}. Error {error}")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Update failed.") from error
 
-    return RedirectResponse(
-        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
-    )
-
-
-@router.put("/{issue_id}")
-@router.post("/{issue_id}")
-async def update_issue(issue_id: int, request: Request, session: Session = Depends(get_db)):
-    data = await request.form()
-    logger.info(data)
-
-    logger.info(IssueUpdate(**data).dict(exclude_unset=True))
-    results: int = (
-        session.query(IssueTable)
-        .filter(IssueTable.id == issue_id)
-        .update(IssueUpdate(**data).dict(exclude_unset=True))
-    )
-
-    session.commit()
-
-    if not results:
-        logger.warning(f"Issue #{issue_id} has not been updated.")
-
-    return RedirectResponse(
-        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
-    )
-
-
-@router.delete("/{issue_id}")
-@router.post("/{issue_id}/delete")
-async def delete_issue(issue_id: int, request: Request, session: Session = Depends(get_db)):
-    issue: IssueTable = session.query(IssueTable).filter_by(id=issue_id).first()
-
-    issue.delete()  # soft delete
-    session.commit()
-
-    return RedirectResponse(
-        urljoin(str(request.base_url), "issues"), status_code=status.HTTP_303_SEE_OTHER
-    )
+    return IdResponse(id=updated_id)

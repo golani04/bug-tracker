@@ -2,15 +2,14 @@ from datetime import date
 
 from starlette.templating import Jinja2Templates
 
-from backend.schemas.issues import Label, Severity, Status
+from backend.enums import Priority, Status
 
 
 templates = Jinja2Templates(directory="frontend/components")
 templates.env.globals = {
     **templates.env.globals,
-    "severity": Severity,
+    "priority": Priority,
     "status": Status,
-    "label": Label,
     "current_year": date.today().year,
     "current_date": date.today(),
 }

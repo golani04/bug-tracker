@@ -1,7 +1,7 @@
-import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, Request
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from backend.db import get_db
@@ -13,15 +13,13 @@ from backend.utils.html import templates
 
 
 router = APIRouter()
-logger = logging.getLogger("bug_tracker")
 
 
 def get_issues_data(issues: List[IssueTable], item_id: int):
     data = [
         {
-            **IssueSchema.from_orm(item).dict(),
-            # "project": ProjectSchema.from_orm(item.project),
-            "user": UserSchema.from_orm(item.owner),
+            **IssueSchema.model_validate(item).model_dump(),
+            "user": UserSchema.model_validate(item.reporter).model_dump(),
         }
         for item in issues
     ]
@@ -33,23 +31,23 @@ def get_issues_data(issues: List[IssueTable], item_id: int):
 @router.get("/{template}")
 def index(
     request: Request,
-    template: str = None,
+    template: str | None = None,
     item_id: int = Query(None),
     session: Session = Depends(get_db),
-    current_user=Depends(auth_manager.get_current_user),
+    current_user: UserSchema = Depends(auth_manager.get_current_user),
 ):
     if template is None:
-        return templates.TemplateResponse("index.html", {"request": request, "current_item": {}})
+        return templates.TemplateResponse(request, "index.html", {"current_item": {}})
 
     data: List[IssueTable] = []
     current_item = {}
     if template.startswith("issues"):
-        data = session.query(IssueTable).all()
+        data = session.execute(select(IssueTable)).scalars().all()
         data, current_item = get_issues_data(data, item_id)
     elif template.startswith("user"):
-        current_item = UserSchema.from_orm(current_user).dict()
+        current_item = current_user.model_dump()
 
     template = template if template.endswith(".html") else f"{template}.html"
     return templates.TemplateResponse(
-        f"pages/{template}", {"request": request, "data": data, "current_item": current_item}
+        request, f"pages/{template}", {"data": data, "current_item": current_item}
     )

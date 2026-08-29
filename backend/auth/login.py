@@ -1,20 +1,18 @@
-import logging
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import Row, or_, select
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import MultipleResultsFound
 
 from backend.db import get_db
-from backend.models.users import User
+from backend.repositories.projects import ProjectRepository
+from backend.repositories.users import UserRepository
+from backend.schemas.users import LoginUser
+from backend.services.users import UserService
 from backend.utils import error_messages
 from backend.utils.auth import auth_manager
 from backend.utils.html import templates
-from backend.utils.security import hash_password, verify_password
 
 
 router = APIRouter()
-logger = logging.getLogger("bug_tracker")
 
 
 @router.get("/logout")
@@ -24,35 +22,27 @@ def logout(request: Request):
     return response
 
 
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout_api(response: Response):
+    response.delete_cookie(auth_manager.cookie_name)
+
+
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("auth/login.html", context={"request": request})
+    return templates.TemplateResponse(request, "auth/login.html")
 
 
-@router.post("/login", response_class=HTMLResponse)
-async def login(
-    username: str = Form(...), password: str = Form(...), sess: Session = Depends(get_db)
-):
-    stmt = select(User.id, User.password).where(
-        or_(User.email == username, User.username == username)
-    )
+@router.post("/login", response_class=JSONResponse, status_code=status.HTTP_200_OK)
+async def login(user: LoginUser, session: Session = Depends(get_db)):
+    service = UserService(UserRepository(session), ProjectRepository(session))
     try:
-        current_user: Row[tuple[int, str]] | None
-        if (current_user := sess.execute(stmt).one_or_none()) is None:
-            raise ValueError
-    except (MultipleResultsFound, ValueError) as e:
-        if isinstance(e, MultipleResultsFound):
-            logger.error(f"Multiple users are found for this {username=}")
+        current_user = service.login(user.email, user.password.get_secret_value())
+    except ValueError as error:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=error_messages.user_not_found) from error
 
-        verify_password("timingattack", hash_password("timingattack"))
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=error_messages.user_not_found) from e
-
-    user_id, user_pwd = current_user
-    if not verify_password(password, user_pwd.encode()):
-        verify_password("timingattack", hash_password("timingattack"))
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=error_messages.user_not_found)
-
-    response = RedirectResponse("/issues", status.HTTP_303_SEE_OTHER)
-    response.set_cookie(auth_manager.cookie_name, auth_manager.create_access_token({"id": user_id}))
+    response = JSONResponse({"success": True})
+    response.set_cookie(
+        auth_manager.cookie_name, auth_manager.create_access_token({"id": current_user.id})
+    )
 
     return response

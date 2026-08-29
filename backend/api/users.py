@@ -1,29 +1,34 @@
-import logging
 from urllib.parse import urljoin
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
-from sqlalchemy import update
-from sqlalchemy.orm import session
+from sqlalchemy.orm import Session
 
 from backend.db import get_db
-from backend.models.users import User as UserTable
-from backend.schemas.users import UserUpdate
+from backend.repositories.projects import ProjectRepository
+from backend.repositories.users import UserRepository
+from backend.schemas.users import User as UserSchema, UserUpdate
+from backend.services.users import UserService
+from backend.utils.auth import auth_manager
 
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
+me_router = APIRouter()
+
+
+@me_router.get("/me", response_model=UserSchema, status_code=status.HTTP_200_OK)
+async def get_me(current_user: UserSchema = Depends(auth_manager.get_current_user)):
+    return current_user
 
 
 @router.post("/{user_id}")
-async def get_issue(request: Request, user_id: int, session: session = Depends(get_db)):
+async def update_user(request: Request, user_id: int, session: Session = Depends(get_db)):
     data = await request.form()
-    session.execute(
-        update(UserTable)
-        .where(UserTable.id == user_id)
-        .values(**UserUpdate(**data).dict(exclude_unset=True))
-    )
-    session.commit()
+    service = UserService(UserRepository(session), ProjectRepository(session))
+    try:
+        service.update(user_id, UserUpdate(**data))
+    except ValueError as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Update failed.") from error
 
     return RedirectResponse(
         urljoin(str(request.base_url), "user"), status_code=status.HTTP_303_SEE_OTHER
