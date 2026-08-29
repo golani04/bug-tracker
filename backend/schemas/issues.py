@@ -1,74 +1,43 @@
-from datetime import date, datetime
-from enum import IntEnum, auto
-from typing import Optional
+from datetime import datetime
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field
 
-
-class Helpers(IntEnum):
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def names(cls):
-        return [item.name for item in cls]
-
-    @classmethod
-    def values(cls):
-        return [item.value for item in cls]
-
-
-class Severity(Helpers):
-    low = 1
-    medium = auto()
-    high = auto()
-
-
-class Status(Helpers):
-    opened = 1
-    in_progress = auto()
-    on_hold = auto()
-    in_review = auto()
-    completed = auto()
-    closed = auto()
-
-
-class Label(Helpers):
-    bug = 1
-    enhancement = auto()
-    duplicated = auto()
-    wontfix = auto()
+from backend.enums import Priority, Status
 
 
 class IssueBase(BaseModel):
     title: str
-    description: str = ""
-    reporter: int
-    type: Optional[str] = Field(None)
-    due: Optional[date] = Field(None)
-    severity: Severity = Field(Severity.low, description=f"Severity levels: {Severity.names()}.")
-    status: Status = Field(Status.opened, description=f"Statuses: {Status.names()}.")
-    label: Label = Field(Label.bug, description=f"Issue types: {Label.names()}.")
+    description: str | None = None
+    priority: Priority = Field(Priority.low)
+    status: Status = Field(Status.open)
 
-    @validator("due", pre=True)
-    def parse_due(cls, value: Optional[date]):
-        """If value is falsy return null"""
 
-        return value or None
+class IssueArgs(BaseModel):
+    """Use this schema to validate query params"""
+
+    title: str | None = None
+    description: str | None = None
+    project_id: int | None = None
+    priority: Priority | None = None
+    status: Status | None = None
+    reporter_id: int | None = None
 
 
 class IssueCreate(IssueBase):
     pass
 
 
-class IssueUpdate(IssueBase):
+class IssueUpdate(IssueArgs):
     pass
 
 
 class Issue(IssueBase):
-    id: int
-    created_at: datetime
-    updated_at: Optional[datetime] = None
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    id: int
+    project_id: int
+    reporter_id: int
+    active: bool
+    created_at: datetime
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None

@@ -1,1 +1,1 @@
-from backend.models import users, issues  # noqa: F401
+from backend.models import base, issues, projects, users  # noqa: F401
