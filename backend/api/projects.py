@@ -68,6 +68,11 @@ async def create_project_issue(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Project not found") from error
 
     issue_service = IssueService(IssueRepository(session))
-    issue_id = issue_service.create_issue(data, reporter_id=current_user.id, project_id=project_id)
+    try:
+        issue_id = issue_service.create_issue(
+            data, reporter_id=current_user.id, project_id=project_id
+        )
+    except ValueError as error:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Failed to create issue.") from error
 
     return IdResponse(id=issue_id)
