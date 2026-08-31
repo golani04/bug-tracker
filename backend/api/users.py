@@ -1,6 +1,7 @@
+from typing import Annotated
 from urllib.parse import urljoin
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -22,14 +23,16 @@ async def get_me(current_user: UserSchema = Depends(auth_manager.get_current_use
 
 
 @router.post("/{user_id}")
-async def update_user(request: Request, user_id: int, session: Session = Depends(get_db)):
-    data = await request.form()
+async def update_user(
+    request: Request,
+    user_id: int,
+    data: Annotated[UserUpdate, Form()],
+    session: Session = Depends(get_db),
+):
     service = UserService(UserRepository(session), ProjectRepository(session))
     try:
-        service.update(user_id, UserUpdate(**data))
+        service.update(user_id, data)
     except ValueError as error:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Update failed.") from error
 
-    return RedirectResponse(
-        urljoin(str(request.base_url), "user"), status_code=status.HTTP_303_SEE_OTHER
-    )
+    return RedirectResponse(urljoin(str(request.base_url), "user"), status_code=status.HTTP_303_SEE_OTHER)
