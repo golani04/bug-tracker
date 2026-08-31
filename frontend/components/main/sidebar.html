@@ -1,25 +1,21 @@
-<aside class="sidebar" data-image="./static/images/sidebar-5.jpg">
-    <div class="sidebar-wrapper">
-        <div class="logo">
-            <a href="/" class="simple-text">
-                Bug Tracker
-            </a>
-        </div>
-        <ul class="nav">
-            {% for caption, icon in (('dashboard', 'fa-chart-pie'), ('user', 'fa-user-circle'), ('issues', 'fa-table'),
-            ('notifications', 'fa-bell')) %}
-            {% set active_class = 'active' if caption == current_page else '' %}
-            <li class="nav-item {{ active_class }}">
-                <a class="nav-link" href="./{{ caption }}.html">
-                    <i class="fas {{ icon }}"></i> {{ caption | title}}
-                </a>
-            </li>
-            {% endfor %}
-            <li class="nav-item active active-pro">
-                <a class="nav-link active" data-bs-toggle="modal" data-bs-target="#create-issue-modal" href="#">
-                    <i class="fas fa-anchor"></i> Create Issue
-                </a>
-            </li>
-        </ul>
+<aside class="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 bg-slate-800 text-slate-200">
+    <div class="px-6 py-5 border-b border-slate-700">
+        <a href="/" class="text-lg font-semibold text-white">
+            Bug Tracker
+        </a>
     </div>
+    <nav class="flex-1 px-2 py-4 space-y-1">
+        {% for caption, icon in (('dashboard', 'fa-chart-pie'), ('user', 'fa-user-circle'), ('issues', 'fa-table'),
+        ('notifications', 'fa-bell')) %}
+        {% set is_active = caption == current_page %}
+        <a href="./{{ caption }}.html"
+            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium {{ 'bg-slate-900 text-white' if is_active else 'text-slate-300 hover:bg-slate-700 hover:text-white' }}">
+            <i class="fas {{ icon }} w-4 text-center"></i> {{ caption | title}}
+        </a>
+        {% endfor %}
+        <a href="#" data-modal-target="create-issue-modal"
+            class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-500 mt-4">
+            <i class="fas fa-anchor w-4 text-center"></i> Create Issue
+        </a>
+    </nav>
 </aside>
