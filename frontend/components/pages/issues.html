@@ -4,61 +4,53 @@
 {% set title = 'Issues' %}
 
 {% block main %}
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Issues</h4>
-                        <p class="card-category">List of issues</p>
-                    </div>
-                    <div class="card-body table-full-width table-responsive">
-                        <table class="table table-striped table-hover table-borderless">
-                            <caption class="visually-hidden">List of projects issues</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col">Username</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Severity</th>
-                                    <th scope="col">Label</th>
-                                    <th scope="col">Due</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for issue in data %}
-                                <tr>
-                                    <td>{{ issue.id }}</td>
-                                    <td>{{ issue.title | capitalize }}</td>
-                                    <td>{{ issue.description | capitalize }}</td>
-                                    <td>{{ issue.user.username }}</td>
-                                    <td>{{ issue.status | replace('_', ' ') | capitalize }}</td>
-                                    <td>{{ issue.severity | replace('_', ' ') | capitalize }}</td>
-                                    <td>{{ issue.label | replace('_', ' ') | capitalize }}</td>
-                                    <td>{{ issue.due }}</td>
-                                    <td class="td-actions">
-                                        <a href="/issues?item_id={{ issue.id }}" rel="tooltip"
-                                            class="btn btn-info btn-simple btn-link"
-                                            data-bs-original-title="Edit Issue">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="/issues?item_id={{ issue.id }}&deleted=1" rel="tooltip"
-                                            data-bs-original-title="Remove Issue"
-                                            class="btn btn-danger btn-simple btn-link">
-                                            <i class="fas fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-5 py-4 border-b border-gray-200">
+            <h4 class="text-lg font-semibold">Issues</h4>
+            <p class="text-sm text-gray-500">List of issues</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <caption class="sr-only">List of projects issues</caption>
+                <thead class="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500">
+                    <tr>
+                        <th scope="col" class="px-4 py-3">ID</th>
+                        <th scope="col" class="px-4 py-3">Title</th>
+                        <th scope="col" class="px-4 py-3">Description</th>
+                        <th scope="col" class="px-4 py-3">Username</th>
+                        <th scope="col" class="px-4 py-3">Status</th>
+                        <th scope="col" class="px-4 py-3">Severity</th>
+                        <th scope="col" class="px-4 py-3">Label</th>
+                        <th scope="col" class="px-4 py-3">Due</th>
+                        <th scope="col" class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for issue in data %}
+                    <tr class="odd:bg-white even:bg-gray-50 hover:bg-blue-50">
+                        <td class="px-4 py-3">{{ issue.id }}</td>
+                        <td class="px-4 py-3">{{ issue.title | capitalize }}</td>
+                        <td class="px-4 py-3">{{ issue.description | capitalize }}</td>
+                        <td class="px-4 py-3">{{ issue.user.username }}</td>
+                        <td class="px-4 py-3">{{ issue.status | replace('_', ' ') | capitalize }}</td>
+                        <td class="px-4 py-3">{{ issue.severity | replace('_', ' ') | capitalize }}</td>
+                        <td class="px-4 py-3">{{ issue.label | replace('_', ' ') | capitalize }}</td>
+                        <td class="px-4 py-3">{{ issue.due }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <a href="/issues?item_id={{ issue.id }}" title="Edit Issue"
+                                class="text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/issues?item_id={{ issue.id }}&deleted=1" title="Remove Issue"
+                                class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

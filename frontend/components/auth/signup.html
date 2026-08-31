@@ -4,34 +4,30 @@
 
 {% block main %}
 
-<div class="container col-xxl-4 col-lg-6 col-md-12 my-4">
+<div class="max-w-md w-full mx-auto my-16 px-4">
 
-    <form class="row g-3" action="/signup" method="POST">
+    <form class="space-y-4" action="/signup" method="POST">
 
-        <h3 class="h3 fw-normal">Sign up</h3>
+        <h3 class="text-2xl font-normal">Sign up</h3>
 
         {% if error %}
-        <div class="col-12">
-            <div class="alert alert-danger" role="alert">{{ error }}</div>
-        </div>
+        <div class="rounded-md bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3" role="alert">{{ error }}</div>
         {% endif %}
 
-        <div class="col-12">
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" name="email" id="email" placeholder="email">
-                <label for="email">Email</label>
-            </div>
+        <div>
+            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+            <input type="email" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                name="email" id="email" placeholder="email">
         </div>
 
-        <div class="col-12">
-            <div class="form-floating">
-                <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-                <label for="password">Password</label>
-            </div>
+        <div>
+            <label for="password" class="block text-sm font-medium mb-1">Password</label>
+            <input type="password" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                name="password" id="password" placeholder="Password">
         </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Sign up</button>
+        <div>
+            <button type="submit" class="rounded-md px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-500">Sign up</button>
         </div>
 
     </form>

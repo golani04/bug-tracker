@@ -4,75 +4,72 @@
 {% set title = 'Dashboard' %}
 
 {% block main %}
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Severity Statistics</h4>
-                        <p class="card-category">Level severity statistics</p>
+<div class="p-4 sm:p-6">
+    <div class="flex flex-col lg:flex-row gap-6">
+        <div class="lg:w-5/12">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h4 class="text-lg font-semibold">Severity Statistics</h4>
+                    <p class="text-sm text-gray-500">Level severity statistics</p>
+                </div>
+                <div class="p-5">
+                    <div id="chart-issues" class="rounded-md border border-dashed border-gray-300 h-48 flex items-center justify-center text-sm text-gray-400 mb-4">
+                        Chart placeholder
                     </div>
-                    <div class="card-body">
-                        <div id="chart-issues" class="ct-chart mb-4"></div>
-                        <div id="chart-issues-legend" class="legend">
-                            <i class="fas fa-circle text-info"></i> Open
-                            <i class="fas fa-circle text-danger"></i> Bounce
-                            <i class="fas fa-circle text-warning"></i> Unsubscribe
-                        </div>
-                        <hr>
-                        <div class="stats">
-                            <i class="far fa-clock"></i> Campaign sent 2 days ago
-                        </div>
+                    <div id="chart-issues-legend" class="flex gap-4 text-sm text-gray-600">
+                        <span><i class="fas fa-circle text-blue-400"></i> Open</span>
+                        <span><i class="fas fa-circle text-red-400"></i> Bounce</span>
+                        <span><i class="fas fa-circle text-amber-400"></i> Unsubscribe</span>
+                    </div>
+                    <hr class="my-4 border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        <i class="far fa-clock"></i> Campaign sent 2 days ago
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="card  card-tasks">
-                    <div class="card-header ">
-                        <h4 class="card-title">Tasks</h4>
-                        <p class="card-category">Backend development</p>
-                    </div>
-                    <div class="card-body ">
-                        <ul class="list-group">
-                            {% for task, checked in (('Sign contract for "What are conference organizers afraid
-                            of?',
-                            True), ('Lines From Great Russian Literature? Or E-mails From My Boss?', False),
-                            ('Flooded: One year later, assessing what was lost and what was found when a
-                            ravaging rain swept through metro Detroit', False), ('Create 4 Invisible User
-                            Experiences you Never Knew About', True), ('Read "Following makes Medium better"',
-                            True)) %}
-                            <li class="list-group-item form-check d-flex justify-content-between mb-0">
-                                <div class="align-self-center">
-                                    <label class="form-check-label me-1">
-                                        {% if checked %}
-                                        <input class="form-check-input" type="checkbox" checked>
-                                        {% else %}
-                                        <input class="form-check-input" type="checkbox">
-                                        {% endif %}
-                                        <span class="form-check-sign"></span>
-                                    </label>{{ task }}
-                                </div>
+        </div>
+        <div class="lg:w-7/12">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-5 py-4 border-b border-gray-200">
+                    <h4 class="text-lg font-semibold">Tasks</h4>
+                    <p class="text-sm text-gray-500">Backend development</p>
+                </div>
+                <div class="p-5">
+                    <ul class="divide-y divide-gray-100">
+                        {% for task, checked in (('Sign contract for "What are conference organizers afraid
+                        of?',
+                        True), ('Lines From Great Russian Literature? Or E-mails From My Boss?', False),
+                        ('Flooded: One year later, assessing what was lost and what was found when a
+                        ravaging rain swept through metro Detroit', False), ('Create 4 Invisible User
+                        Experiences you Never Knew About', True), ('Read "Following makes Medium better"',
+                        True)) %}
+                        <li class="flex items-center justify-between py-3">
+                            <label class="flex items-center gap-2 text-sm">
+                                {% if checked %}
+                                <input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" type="checkbox" checked>
+                                {% else %}
+                                <input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" type="checkbox">
+                                {% endif %}
+                                {{ task }}
+                            </label>
 
-                                <div class="d-flex flex-column">
-                                    <button type="button" rel="tooltip" title="Edit Task"
-                                        class="btn btn-info btn-simple btn-link px-2 py-1">
-                                        <i class="far fa-edit"></i>
-                                    </button>
-                                    <button type="button" rel="tooltip" title="Remove"
-                                        class="btn btn-danger btn-simple btn-link px-2 py-1">
-                                        <i class="far fa-times-circle"></i>
-                                    </button>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="card-footer ">
-                        <hr>
-                        <div class="stats">
-                            <i class="far fa-clock"></i> Updated 3 minutes ago
-                        </div>
+                            <div class="flex gap-1 shrink-0">
+                                <button type="button" title="Edit Task"
+                                    class="text-blue-500 hover:text-blue-700 px-2 py-1">
+                                    <i class="far fa-edit"></i>
+                                </button>
+                                <button type="button" title="Remove"
+                                    class="text-red-500 hover:text-red-700 px-2 py-1">
+                                    <i class="far fa-times-circle"></i>
+                                </button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="px-5 py-4 border-t border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        <i class="far fa-clock"></i> Updated 3 minutes ago
                     </div>
                 </div>
             </div>
