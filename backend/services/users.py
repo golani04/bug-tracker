@@ -12,6 +12,9 @@ class UserService:
         self.project_repository = project_repository
 
     def sign_up(self, data: UserCreate) -> UserModel:
+        if self.repository.get_by_email(data.email) is not None:
+            raise ValueError("Email is already registered")
+
         user = UserModel.create_user(email=data.email, password=data.password.get_secret_value())
         self.repository.create(user)
 
