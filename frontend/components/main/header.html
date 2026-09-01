@@ -15,9 +15,11 @@
                     <li><a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" href="#">Another notification</a></li>
                 </ul>
             </details>
-            <a class="text-sm font-medium text-gray-600 hover:text-gray-900" href="/logout">
-                Log out
-            </a>
+            <form action="/logout" method="post">
+                <button type="submit" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                    Log out
+                </button>
+            </form>
         </div>
     </div>
 </header>
