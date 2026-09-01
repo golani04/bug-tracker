@@ -4,36 +4,45 @@
 
 ## Development
 
+All commands below are run from the repo root; `--project backend` points `uv` at `backend/pyproject.toml` regardless of your shell's active environment.
+
 Install Python 3.14 and create the project environment:
 
 ```sh
 uv python install 3.14
-uv sync --dev
+uv sync --project backend --dev
 ```
 
 Starting dev server run:
 
 ```sh
-uv run uvicorn main:app --reload
+uv run --project backend uvicorn backend.main:app --reload
+```
+
+Or use the shortcut for your shell:
+
+```sh
+make dev        # bash, WSL, macOS/Linux
+./dev.ps1       # PowerShell
 ```
 
 Output `requirements.txt`:
 
 ```sh
-uv export --no-dev --format requirements-txt --no-hashes --output-file requirements.txt
+uv export --project backend --no-dev --format requirements-txt --no-hashes --output-file backend/requirements.txt
 ```
 
 Create and init db:
 
 ```sh
-uv run python -m tools.init_db
+uv run --project backend python -m backend.tools.init_db
 ```
 
 Format, lint, and sort imports with Ruff:
 
 ```sh
-uv run ruff format .
-uv run ruff check --fix .
+uv run --project backend ruff format backend
+uv run --project backend ruff check --fix backend
 ```
 
 [Trello cards](https://trello.com/b/sIgFvLWc/bug-tracker).
