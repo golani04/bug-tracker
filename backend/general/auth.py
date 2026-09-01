@@ -66,7 +66,7 @@ async def sign_up(
     return response
 
 
-@router.get("/logout")
+@router.post("/logout")
 def logout(request: Request):
     response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
     response.delete_cookie(auth_manager.cookie_name)
