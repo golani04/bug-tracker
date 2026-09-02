@@ -14,7 +14,7 @@ app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
 @app.exception_handler(AuthError)
 async def auth_error_handler(request: Request, exc: AuthError) -> RedirectResponse:
-    return RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    return RedirectResponse("/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
 # create logger
