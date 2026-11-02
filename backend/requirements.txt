@@ -30,7 +30,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     # via click
 cryptography==50.0.0
     # via python-jose
-dnspython==2.8.0
+dnspython==2.9.0
     # via email-validator
 ecdsa==0.19.2
     # via python-jose
